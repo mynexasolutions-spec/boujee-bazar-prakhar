@@ -62,6 +62,8 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
 import { CartProvider } from '@/context/CartContext'
+import { WishlistProvider } from '@/context/WishlistContext'
+import { ToastProvider } from '@/context/ToastContext'
 // import { AuthProvider } from '@/context/AuthContext'
 import './globals.css'
 
@@ -108,9 +110,13 @@ export default function RootLayout({
 
       <body>
          {/* <AuthProvider>  */}
-          <CartProvider>
-            {children}
-          </CartProvider>
+          <ToastProvider>
+            <WishlistProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
+            </WishlistProvider>
+          </ToastProvider>
          {/* </AuthProvider> */}
       </body>
     </html>

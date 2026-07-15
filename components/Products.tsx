@@ -168,7 +168,7 @@ interface Product {
   reviewCount: number
 }
 
-export default function Products() {
+export default function Products({ products: dbProducts }: { products?: Product[] }) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -233,12 +233,13 @@ export default function Products() {
   ]
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
+    if (dbProducts && dbProducts.length > 0) {
+      setProducts(dbProducts)
+    } else {
       setProducts(mockProducts)
-      setLoading(false)
-    }, 500)
-  }, [])
+    }
+    setLoading(false)
+  }, [dbProducts])
 
   return (
     <section className="bestsellers">

@@ -3,7 +3,7 @@ import Footer from '@/components/Footer'
 import AuthForm from './_components/AuthForm'
 
 export const metadata = {
-  title: 'Login | Gulshan Modest',
+  title: 'Login | The Boujee Bazaar',
   description: 'Login securely with your phone number and password.',
 }
 

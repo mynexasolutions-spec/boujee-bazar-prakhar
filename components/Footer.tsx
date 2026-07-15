@@ -1,122 +1,6 @@
-// import Image from "next/image";
-// import { navLinks, SITE } from "@/lib/data";
-// import BotanicalDivider from "./BotanicalDivider";
+'use client'
 
-// export default function Footer() {
-//   return (
-//     <footer className="relative bg-emerald-deep pt-4">
-//       <BotanicalDivider tone="gold" />
-//       <div className="max-w-wrap mx-auto px-5 md:px-8 pb-10 pt-8">
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1.2fr_1fr] gap-10 lg:gap-8">
-//           {/* Column 1: Brand Info */}
-//           <div>
-//             <div className="flex items-center gap-2.5">
-//               <Image
-//                 src="/logo-light.webp"
-//                 alt="Gulshan Modest logo"
-//                 width={48}
-//                 height={48}
-//                 className="h-12 w-12 object-contain"
-//               />
-//               <span className="font-display font-semibold text-lg text-cream">
-//                 Gulshan Modest
-//               </span>
-//             </div>
-//             <p className="text-cream/60 text-sm mt-4 max-w-xs leading-relaxed">
-//               Modest fashion with botanical detailing, premium fabric and
-//               timeless silhouettes — designed in Delhi NCR, shipped pan-India.
-//             </p>
-//           </div>
-
-//           {/* Column 2: Explore */}
-//           <div>
-//             <h4 className="font-display font-semibold text-cream text-sm tracking-wide uppercase">
-//               Explore
-//             </h4>
-//             <ul className="mt-4 space-y-2.5">
-//               {navLinks.map((link) => (
-//                 <li key={link.href}>
-//                   <a
-//                     href={link.href}
-//                     className="text-cream/65 text-sm hover:text-gold-light transition-colors"
-//                   >
-//                     {link.label}
-//                   </a>
-//                 </li>
-//               ))}
-//               <li>
-//                 <a href="/about" className="text-cream/65 text-sm hover:text-gold-light transition-colors">
-//                   About Us
-//                 </a>
-//               </li>
-//             </ul>
-//           </div>
-
-//           {/* Column 3: Legal & Policies */}
-//           <div>
-//             <h4 className="font-display font-semibold text-cream text-sm tracking-wide uppercase">
-//               Legal & Policies
-//             </h4>
-//             <ul className="mt-4 space-y-2.5">
-//               <li>
-//                 <a href="/policies/privacy" className="text-cream/65 text-sm hover:text-gold-light transition-colors">
-//                   Privacy Policy
-//                 </a>
-//               </li>
-//               <li>
-//                 <a href="/policies/terms" className="text-cream/65 text-sm hover:text-gold-light transition-colors">
-//                   Terms & Conditions
-//                 </a>
-//               </li>
-//               <li>
-//                 <a href="/policies/refund" className="text-cream/65 text-sm hover:text-gold-light transition-colors">
-//                   Refund & Cancellation
-//                 </a>
-//               </li>
-//               <li>
-//                 <a href="/policies/shipping" className="text-cream/65 text-sm hover:text-gold-light transition-colors">
-//                   Shipping & Delivery
-//                 </a>
-//               </li>
-//             </ul>
-//           </div>
-
-//           {/* Column 4: Contact */}
-//           <div>
-//             <h4 className="font-display font-semibold text-cream text-sm tracking-wide uppercase">
-//               Contact
-//             </h4>
-//             <ul className="mt-4 space-y-2.5 text-sm text-cream/65">
-//               <li>
-//                 <a href={`mailto:${SITE.email}`} className="hover:text-gold-light transition-colors break-all">
-//                   {SITE.email}
-//                 </a>
-//               </li>
-//               <li>
-//                 <a href={`tel:${SITE.phoneHref}`} className="hover:text-gold-light transition-colors">
-//                   {SITE.phone}
-//                 </a>
-//               </li>
-//               <li>{SITE.city}</li>
-//             </ul>
-//           </div>
-//         </div>
-
-//         <div className="mt-10 pt-6 border-t border-cream/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-//           <p className="text-cream/45 text-xs">
-//             © {new Date().getFullYear()} Gulshan Modest. All rights reserved.
-//           </p>
-//           <p className="text-cream/45 text-xs">
-//             Crafted with care, garden by garden.
-//           </p>
-//         </div>
-//       </div>
-//     </footer>
-//   );
-// }
-"use client";
-
-import React from "react";
+import React from 'react'
 
 export default function Footer() {
   return (
@@ -129,9 +13,9 @@ export default function Footer() {
           </div>
           <p style={{ marginTop: "15px" }}>Minimal jewelry for the <br />maximal you. ✨</p>
           <div className="social-icons" style={{ marginTop: "15px", display: "flex", gap: "15px" }}>
-            <a href="#"><i className="fa-brands fa-instagram"></i></a>
-            <a href="#"><i className="fa-brands fa-pinterest-p"></i></a>
-            <a href="#"><i className="fa-brands fa-whatsapp"></i></a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-instagram"></i></a>
+            <a href="https://pinterest.com" target="_blank" rel="noreferrer"><i className="fa-brands fa-pinterest-p"></i></a>
+            <a href="https://wa.me/919999999999" target="_blank" rel="noreferrer"><i className="fa-brands fa-whatsapp"></i></a>
           </div>
         </div>
 
@@ -139,18 +23,30 @@ export default function Footer() {
           <h4>SHOP</h4>
           <ul>
             <li><a href="/shop">All Products</a></li>
-            <li><a href="#">Rings</a></li>
-            <li><a href="#">Earrings</a></li>
-            <li><a href="#">Necklaces</a></li>
+            <li><a href="/shop?category=rings">Rings</a></li>
+            <li><a href="/shop?category=earrings">Earrings</a></li>
+            <li><a href="/shop?category=necklaces">Necklaces</a></li>
+            <li><a href="/shop?category=watches">Watches</a></li>
           </ul>
         </div>
 
         <div className="footer-links">
-          <h4>HELP</h4>
+          <h4>HELP & SUPPORT</h4>
           <ul>
-            <li><a href="#">FAQs</a></li>
-            <li><a href="#">Shipping & Delivery</a></li>
-            <li><a href="#">Returns & Exchanges</a></li>
+            <li><a href="/faq">FAQs</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact Us</a></li>
+            <li><a href="/track-order">Track Your Order</a></li>
+          </ul>
+        </div>
+
+        <div className="footer-links">
+          <h4>LEGAL</h4>
+          <ul>
+            <li><a href="/policies/shipping">Shipping Policy</a></li>
+            <li><a href="/policies/return-exchange">Return & Exchange Policy</a></li>
+            <li><a href="/policies/privacy">Privacy Policy</a></li>
+            <li><a href="/policies/terms">Terms & Conditions</a></li>
           </ul>
         </div>
 
@@ -161,11 +57,13 @@ export default function Footer() {
             <input type="email" placeholder="Enter your email" required />
             <button type="submit"><i className="fa-solid fa-arrow-right"></i></button>
           </form>
-          <div className="payment-icons" style={{ marginTop: "20px", display: "flex", gap: "10px", fontSize: "1.5rem", color: "#666" }}>
-            <i className="fa-brands fa-cc-visa"></i>
-            <i className="fa-brands fa-cc-mastercard"></i>
-            <i className="fa-brands fa-cc-amex"></i>
-            <i className="fa-brands fa-cc-paypal"></i>
+          
+          <h4 style={{ marginTop: '20px', fontSize: '10px' }}>SECURE PAYMENTS</h4>
+          <div className="payment-icons" style={{ marginTop: "10px", display: "flex", gap: "10px", fontSize: "1.5rem", color: "#666" }}>
+            <i className="fa-brands fa-cc-visa" title="Visa"></i>
+            <i className="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+            <i className="fa-brands fa-cc-rupay" title="Rupay"></i>
+            <i className="fa-solid fa-credit-card" title="UPI / Banking"></i>
           </div>
         </div>
       </div>

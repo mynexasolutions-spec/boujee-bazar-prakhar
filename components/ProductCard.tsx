@@ -1,7 +1,9 @@
-// components/ProductCard.tsx
 'use client'
 
-import { useState } from 'react'
+import React from 'react'
+import Link from 'next/link'
+import { useWishlist } from '@/context/WishlistContext'
+import { useToast } from '@/context/ToastContext'
 
 interface ProductCardProps {
   id?: string
@@ -22,38 +24,31 @@ export default function ProductCard({
   reviewCount,
   alt = name,
 }: ProductCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState(false)
+  const { toggleWishlist, isInWishlist } = useWishlist()
+  const { showToast } = useToast()
+  
+  const favorited = isInWishlist(id)
 
-  // Wishlist toggle (from script.js)
-  const toggleWishlist = (e: React.MouseEvent) => {
+  const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault()
-    setIsWishlisted(!isWishlisted)
-    const btn = (e.target as HTMLElement).closest('.wishlist-btn') as HTMLElement
-    if (btn) {
-      const icon = btn.querySelector('i')
-      if (icon) {
-        if (isWishlisted) {
-          icon.classList.remove('fa-solid')
-          icon.classList.add('fa-regular')
-          icon.style.color = ''
-        } else {
-          icon.classList.remove('fa-regular')
-          icon.classList.add('fa-solid')
-          icon.style.color = '#F5A24A'
-        }
-      }
-    }
+    e.stopPropagation()
+    toggleWishlist({
+      id,
+      name,
+      price,
+      image_url: image
+    })
+    showToast(favorited ? `Removed ${name} from wishlist.` : `Saved ${name} to wishlist!`, 'success')
   }
 
-  // Render stars
   const renderStars = () => {
     const stars = []
     for (let i = 0; i < 5; i++) {
       stars.push(
         <i
           key={i}
-          className={`fa-${i < Math.floor(rating) ? 'solid' : i < rating ? 'regular' : 'solid'} fa-star`}
-          style={{ color: i < Math.floor(rating) ? '#FFD700' : '#ccc' }}
+          className={`fa-${i < Math.floor(rating) ? 'solid' : 'regular'} fa-star`}
+          style={{ color: i < Math.floor(rating) ? '#FFD700' : '#ccc', marginRight: '2px' }}
         ></i>
       )
     }
@@ -61,25 +56,30 @@ export default function ProductCard({
   }
 
   return (
-    <div className="product-card">
-      {/* Product Image Wrapper - from index.html */}
-      <div className="product-img-wrapper">
-        <img src={image} alt={alt} />
-        <button 
-          className="wishlist-btn"
-          onClick={toggleWishlist}
-          aria-label="Add to wishlist"
-        >
-          <i className={`fa-${isWishlisted ? 'solid' : 'regular'} fa-heart`}></i>
-        </button>
-      </div>
+    <div className="product-card relative">
+      {/* Product Image Wrapper */}
+      <Link href={`/shop/${id}`} className="block">
+        <div className="product-img-wrapper">
+          <img src={image} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <button 
+            className="wishlist-btn"
+            onClick={handleWishlistToggle}
+            aria-label="Add to wishlist"
+            style={{ zIndex: 10 }}
+          >
+            <i className={`fa-heart ${favorited ? 'fa-solid text-red-500' : 'fa-regular'}`} style={{ color: favorited ? '#ef4444' : '' }}></i>
+          </button>
+        </div>
+      </Link>
 
-      {/* Product Info - from index.html */}
+      {/* Product Info */}
       <div className="product-info">
-        <h3 className="product-name">{name}</h3>
+        <Link href={`/shop/${id}`} className="hover:text-[#c5a880] transition-colors">
+          <h3 className="product-name">{name}</h3>
+        </Link>
         <p className="product-price">₹{price.toLocaleString('en-IN')}</p>
 
-        {/* Product Rating - from index.html */}
+        {/* Product Rating */}
         <div className="product-rating">
           {renderStars()}
           <span>({reviewCount})</span>

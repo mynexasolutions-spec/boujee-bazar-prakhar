@@ -1,269 +1,12 @@
-// 'use client'
-
-// import React, { useState, useEffect } from 'react'
-// import Image from 'next/image'
-// import Link from 'next/link'
-// import { useCart } from '@/context/CartContext'
-// import { useRouter, useSearchParams } from 'next/navigation'
-// import { ShoppingBag, ArrowRight } from 'lucide-react'
-
-// type Product = {
-//   id: string
-//   name: string
-//   price: number
-//   oldPrice?: number
-//   image_url: string
-//   category_id: string
-//   badge?: string
-//   rating: number
-//   is_active: boolean
-//   colorCount?: number
-// }
-
-// type Category = {
-//   id: string
-//   name: string
-// }
-
-// type ShopGridProps = {
-//   initialProducts: Product[]
-//   categories: Category[]
-//   selectedCategory: string
-// }
-
-// export default function ShopGrid({ initialProducts, categories, selectedCategory }: ShopGridProps) {
-//   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-//     selectedCategory ? [selectedCategory] : []
-//   )
-//   const [maxPrice, setMaxPrice] = useState<number>(15000)
-//   const { addToCart } = useCart()
-//   const router = useRouter()
-
-//   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
-
-//   useEffect(() => {
-//     if (selectedCategory) {
-//       setSelectedCategories([selectedCategory])
-//     } else {
-//       setSelectedCategories([])
-//     }
-//   }, [selectedCategory])
-
-//   const toggleCategory = (id: string) => {
-//     setSelectedCategories(prev => 
-//       prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
-//     )
-//   }
-
-//   // Filter products by category and price
-//   const filteredProducts = initialProducts.filter(p => {
-//     if (p.is_active === false) return false;
-//     if (selectedCategories.length > 0 && !selectedCategories.includes(p.category_id)) return false;
-//     if (p.price > maxPrice) return false;
-//     return true;
-//   });
-
-//   const FilterContent = (
-//     <div className="space-y-8">
-//       {/* Category Checkboxes */}
-//       <div>
-//         <h3 className="font-display font-bold text-xl text-ink mb-4 border-b border-cream-line/60 pb-3">Categories</h3>
-//         <div className="space-y-3.5">
-//           {categories.map((cat) => (
-//             <label key={cat.id} className="flex items-center gap-3 cursor-pointer group">
-//               <input 
-//                 type="checkbox" 
-//                 className="hidden" 
-//                 checked={selectedCategories.includes(cat.id)}
-//                 onChange={() => toggleCategory(cat.id)}
-//               />
-//               <div 
-//                 className={`w-5 h-5 rounded border flex items-center justify-center transition-colors shadow-sm ${
-//                   selectedCategories.includes(cat.id) 
-//                     ? 'bg-emerald border-emerald' 
-//                     : 'bg-white border-cream-line group-hover:border-emerald'
-//                 }`}
-//               >
-//                 {selectedCategories.includes(cat.id) && (
-//                   <svg className="w-3.5 h-3.5 text-cream" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-//                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-//                   </svg>
-//                 )}
-//               </div>
-//               <span className="text-ink/80 text-[15px] font-medium group-hover:text-emerald transition-colors">
-//                 {cat.name}
-//               </span>
-//             </label>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Price Slider */}
-//       <div>
-//         <div className="flex items-center justify-between mb-4 border-b border-cream-line/60 pb-3">
-//           <h3 className="font-display font-bold text-xl text-ink">Max Price</h3>
-//           <span className="font-bold text-emerald">₹{maxPrice.toLocaleString('en-IN')}</span>
-//         </div>
-//         <input 
-//           type="range" 
-//           min="500" 
-//           max="15000" 
-//           step="100" 
-//           value={maxPrice} 
-//           onChange={(e) => setMaxPrice(Number(e.target.value))}
-//           className="w-full cursor-pointer accent-emerald"
-//         />
-//         <div className="flex justify-between text-[11px] text-ink/50 mt-3 font-bold uppercase tracking-wider">
-//           <span>₹500</span>
-//           <span>₹15,000</span>
-//         </div>
-//       </div>
-//     </div>
-//   )
-
-//   return (
-//     <>
-//       {/* Mobile Filter Drawer Overlay */}
-//       {isMobileFilterOpen && (
-//         <div className="fixed inset-0 z-[100000] flex lg:hidden">
-//           <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm" onClick={() => setIsMobileFilterOpen(false)} />
-//           <div className="relative mr-auto w-[85%] max-w-sm h-full bg-white p-6 overflow-y-auto flex flex-col shadow-2xl">
-//             <div className="flex items-center justify-between mb-8 border-b border-cream-line/60 pb-4">
-//               <h2 className="font-display font-bold text-2xl text-ink">Filters</h2>
-//               <button onClick={() => setIsMobileFilterOpen(false)} className="p-2 bg-cream rounded-full text-ink/70 hover:text-emerald transition-colors">
-//                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-//               </button>
-//             </div>
-//             {FilterContent}
-//           </div>
-//         </div>
-//       )}
-
-//       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
-//         {/* Left Sidebar Filter (Desktop) */}
-//         <div className="hidden lg:block lg:col-span-1 bg-white p-6 rounded-[28px] border border-emerald/10 shadow-lg h-fit sticky top-[100px]">
-//           {FilterContent}
-//         </div>
-
-//         {/* Main Grid Area */}
-//         <div className="lg:col-span-3 space-y-6">
-//           <div className="flex items-center justify-between pb-3 border-b border-cream-line/50">
-//             <p className="text-[15px] font-bold text-ink/70">
-//               Showing <span className="text-emerald">{filteredProducts.length}</span> products
-//             </p>
-//             {/* Mobile Filter Toggle */}
-//             <button 
-//               onClick={() => setIsMobileFilterOpen(true)}
-//               className="lg:hidden px-4 py-2 bg-emerald text-cream rounded-full text-sm font-semibold flex items-center gap-2 shadow-sm"
-//             >
-//               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-//               </svg>
-//               Filters
-//             </button>
-//           </div>
-
-//           {filteredProducts.length === 0 ? (
-//             <div className="text-center py-20 text-ink/50 bg-white rounded-[28px] border border-emerald/10 shadow-lg">
-//               No products match your filters.
-//             </div>
-//           ) : (
-//             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-//             {filteredProducts.map((p) => {
-//               const catName = categories.find(c => c.id === p.category_id)?.name || p.category_id
-//               return (
-//                 <div key={p.id} className="lift group bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-cream-line/80 flex flex-col">
-//                   <Link href={`/shop/${p.id}`} className="relative aspect-[4/5] overflow-hidden block bg-cream-deep/20">
-//                     <Image
-//                       src={p.image_url}
-//                       alt={p.name}
-//                       fill
-//                       sizes="(max-width: 768px) 50vw, 320px"
-//                       className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-//                     />
-//                     {p.badge && (
-//                       <span className="absolute top-3 left-3 bg-emerald text-cream text-[9px] md:text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-sm">
-//                         {p.badge}
-//                       </span>
-//                     )}
-//                     <span className="absolute bottom-3 right-3 bg-gold text-cream text-[9px] font-bold tracking-widest uppercase px-2 py-1 rounded shadow-sm">
-//                       {catName}
-//                     </span>
-//                   </Link>
-
-//                   <div className="p-3 md:p-4 flex flex-col flex-1">
-//                     <div className="flex-1">
-//                       <Link href={`/shop/${p.id}`} className="hover:text-emerald transition-colors">
-//                         <h3 className="font-display font-semibold text-ink text-[13px] md:text-[15px] leading-snug line-clamp-2">
-//                           {p.name}
-//                         </h3>
-//                       </Link>
-//                       {p.colorCount && p.colorCount > 1 && (
-//                         <p className="mt-1 text-[11px] font-semibold text-emerald">
-//                           {p.colorCount} colors available
-//                         </p>
-//                       )}
-//                     </div>
-
-//                     <div className="mt-2 flex items-center gap-2">
-//                       <span className="font-display font-bold text-ink text-[14px] md:text-base">
-//                         ₹{p.price.toLocaleString('en-IN')}
-//                       </span>
-//                       {p.originalPrice && (
-//                         <span className="text-ink/40 text-[12px] line-through">
-//                           ₹{p.originalPrice.toLocaleString('en-IN')}
-//                         </span>
-//                       )}
-//                     </div>
-
-//                     <div className="mt-3 grid grid-cols-1 gap-2">
-//                       <button
-//                         onClick={() => addToCart({
-//                           id: p.id,
-//                           name: p.name,
-//                           price: p.price,
-//                           image_url: p.image_url,
-//                           category_name: catName
-//                         })}
-//                         className="w-full text-center rounded-lg border border-emerald/50 text-emerald text-[13px] md:text-sm font-bold py-2.5 hover:bg-emerald hover:border-emerald hover:text-cream transition-colors flex items-center justify-center"
-//                       >
-//                         Add to cart
-//                       </button>
-//                       <button
-//                         onClick={() => {
-//                           addToCart({
-//                             id: p.id,
-//                             name: p.name,
-//                             price: p.price,
-//                             image_url: p.image_url,
-//                             category_name: catName
-//                           });
-//                           router.push('/checkout');
-//                         }}
-//                         className="w-full text-center rounded-lg bg-emerald text-cream text-[13px] md:text-sm font-bold py-2.5 hover:bg-emerald-deep transition-colors flex items-center justify-center shadow-sm"
-//                       >
-//                         Buy now
-//                       </button>
-//                     </div>
-//                   </div>
-//                 </div>
-//               )
-//             })}
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </>
-//   )
-// }
 'use client'
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
-import { useRouter } from 'next/navigation'
+import { useWishlist } from '@/context/WishlistContext'
+import { useToast } from '@/context/ToastContext'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 type Product = {
   id: string
@@ -274,6 +17,7 @@ type Product = {
   image_url: string
   category_id: string
   category_name?: string
+  subcategory?: string
   badge?: string
   rating: number
   colorCount?: number
@@ -296,7 +40,11 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
   )
   const [maxPrice, setMaxPrice] = useState<number>(15000)
   const { addToCart } = useCart()
+  const { toggleWishlist, isInWishlist } = useWishlist()
+  const { showToast } = useToast()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const filterParam = searchParams ? searchParams.get('filter') : null
 
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
@@ -315,13 +63,53 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
     )
   }
 
-  // Filter products by category and max price threshold safely
+  // Filter products by category, subcategory, type, and max price threshold safely
   const filteredProducts = initialProducts.filter(p => {
     const itemCatId = p.category_id?.trim().toLowerCase()
-    if (selectedCategories.length > 0 && !selectedCategories.includes(itemCatId)) return false
+    const itemSubcat = p.subcategory?.trim().toLowerCase()
+
+    // 1. Category / Subcategory Matching
+    if (selectedCategories.length > 0) {
+      const isMatched = selectedCategories.some(
+        (cat) => cat === itemCatId || cat === itemSubcat
+      )
+      if (!isMatched) return false
+    }
+
+    // 2. Filter Param Matching (New Arrivals, Best Sellers, Sale)
+    if (filterParam) {
+      const type = filterParam.toLowerCase()
+      if (type === 'new-arrivals') {
+        const isNew = p.badge?.toLowerCase() === 'new' || p.id.startsWith('n')
+        if (!isNew) return false
+      } else if (type === 'best-sellers' || type === 'bestsellers') {
+        const isBest = p.badge?.toLowerCase() === 'bestseller' || p.badge?.toLowerCase() === 'hot' || p.id.startsWith('b')
+        if (!isBest) return false
+      } else if (type === 'sale') {
+        const isSale = (p.originalPrice && p.originalPrice > p.price) || p.badge?.toLowerCase() === 'sale'
+        if (!isSale) return false
+      }
+    }
+
+    // 3. Price Threshold
     if (p.price > maxPrice) return false
+
     return true
   })
+
+  const handleWishlistToggle = (p: Product, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleWishlist({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      image_url: p.image_url,
+      category_name: p.category_name
+    })
+    const saved = isInWishlist(p.id)
+    showToast(saved ? `Removed ${p.name} from wishlist.` : `Saved ${p.name} to wishlist!`, 'success')
+  }
 
   const FilterContent = (
     <div className="space-y-8">
@@ -429,7 +217,8 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
               Filters
             </button>
           </div>
-{filteredProducts.length === 0 ? (
+
+          {filteredProducts.length === 0 ? (
             <div className="text-center py-20 text-neutral-400 bg-white rounded-2xl border border-neutral-100 shadow-sm">
               No luxury pieces match your current filter constraints.
             </div>
@@ -439,10 +228,20 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
                 const matchedCat = categories.find(c => c.id.trim().toLowerCase() === p.category_id?.trim().toLowerCase())
                 const catName = matchedCat ? matchedCat.name : (p.category_name || "Jewelry")
                 const itemStrikePrice = p.originalPrice || p.oldPrice
+                const favorited = isInWishlist(p.id)
                 
                 return (
-                  <div key={p.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-neutral-100 flex flex-col transition-all duration-300">
+                  <div key={p.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-neutral-100 flex flex-col transition-all duration-300 relative">
                     
+                    {/* Wishlist Heart Icon Toggle Button */}
+                    <button 
+                      onClick={(e) => handleWishlistToggle(p, e)}
+                      className="absolute top-3 right-3 z-10 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-neutral-600 shadow-sm transition-all"
+                      title="Save to wishlist"
+                    >
+                      <i className={`fa-heart text-sm ${favorited ? "fa-solid text-red-500 animate-heartbeat" : "fa-regular"}`}></i>
+                    </button>
+
                     {/* Media Frame Asset Anchor */}
                     <Link href={`/shop/${p.id}`} className="relative aspect-[4/5] overflow-hidden block bg-neutral-50">
                       <Image
@@ -477,7 +276,7 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
                         )}
                       </div>
 
-                      {/* ✅ FIXED: Re-added missing Price Row Display element */}
+                      {/* Price Row Display element */}
                       <div className="mt-3 flex items-baseline gap-1.5">
                         <span className="text-sm font-bold text-neutral-900">
                           ₹{p.price.toLocaleString('en-IN')}
@@ -489,48 +288,44 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
                         )}
                       </div>
 
-                      {/* ✅ FIXED: Restored complete button layout markup rules safely */}
+                      {/* Buy Now layout buttons */}
                       <div className="mt-3.5 space-y-2">
                         <button
                           onClick={async () => {
-    // 1. Add the item right into your cookie data layer instantly
-    addToCart({
-      id: p.id,
-      name: p.name,
-      price: p.price,
-      image_url: p.image_url,
-      quantity: 1,
-      category_name: catName
-    });
+                            // Add the item to cart
+                            addToCart({
+                              id: p.id,
+                              name: p.name,
+                              price: p.price,
+                              image_url: p.image_url,
+                              quantity: 1,
+                              category_name: catName
+                            });
 
-    // 2. Client fallback string injection to keep state providers synchronized
-    if (typeof window !== 'undefined') {
-      const currentItem = {
-        id: p.id,
-        cartItemId: p.id + '-init',
-        name: p.name,
-        price: p.price,
-        image: p.image_url,
-        quantity: 1,
-        category_name: catName
-      };
+                            if (typeof window !== 'undefined') {
+                              const currentItem = {
+                                id: p.id,
+                                cartItemId: p.id + '-init',
+                                name: p.name,
+                                price: p.price,
+                                image: p.image_url,
+                                quantity: 1,
+                                category_name: catName
+                              };
 
-      // Set cookie directly in the browser layer for immediate checkout page discovery
-      const encodedData = encodeURIComponent(JSON.stringify([currentItem]));
-      document.cookie = `boujee-cart-token=${encodedData}; path=/; max-age=604800;`;
-      
-      // Sync local storage keys
-      localStorage.setItem('cart', JSON.stringify([currentItem]));
-      localStorage.setItem('gulshan-cart', JSON.stringify([currentItem]));
-      localStorage.setItem('boujee-cart', JSON.stringify([currentItem]));
-    }
+                              const encodedData = encodeURIComponent(JSON.stringify([currentItem]));
+                              document.cookie = `boujee-cart-token=${encodedData}; path=/; max-age=604800;`;
+                              
+                              localStorage.setItem('cart', JSON.stringify([currentItem]));
+                              localStorage.setItem('gulshan-cart', JSON.stringify([currentItem]));
+                              localStorage.setItem('boujee-cart', JSON.stringify([currentItem]));
+                            }
 
-    // 3. Perform a full native page transition to break caching
-    window.location.href = '/checkout';
-  }}
-  className="w-full text-center rounded-xl bg-neutral-900 text-white text-xs md:text-sm font-semibold py-2 hover:bg-neutral-800 transition-colors flex items-center justify-center shadow-xs"
->
-  Buy now
+                            window.location.href = '/checkout';
+                          }}
+                          className="w-full text-center rounded-xl bg-neutral-900 text-white text-xs md:text-sm font-semibold py-2.5 hover:bg-neutral-800 transition-colors flex items-center justify-center shadow-xs"
+                        >
+                          Buy now
                         </button>
                       </div>
 

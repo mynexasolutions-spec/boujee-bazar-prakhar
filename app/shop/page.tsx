@@ -187,6 +187,7 @@ export default async function ShopPage({
     slug: p.id, // Bypasses missing slug strings with standard reference ids
     category_id: p.category?.trim().toLowerCase() || '',
     category_name: p.category || 'Jewelry',
+    subcategory: p.subcategory?.trim().toLowerCase() || '',
     image_url: p.image || '/assets/img/placeholder.jpeg',
     price: p.price || 0,
     originalPrice: p.originalPrice || undefined,

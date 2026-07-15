@@ -124,18 +124,20 @@
 // }
 
 // app/page.tsx
-import Navbar from '@/components/Navbar'
+import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import Collections from '@/components/Collections'
+import NewArrivals from '@/components/NewArrivals'
 import Products from '@/components/Products'
+import SaleSection from '@/components/SaleSection'
 import Features from '@/components/Features'
-import About from '@/components/About'
 import Reviews from '@/components/Reviews'
-import Trust from '@/components/Trust'
 import Instagram from '@/components/Instagram'
 import Newsletter from '@/components/Newsletter'
 import FAQ from '@/components/FAQ'
 import Footer from '@/components/Footer'
+import FloatingWhatsApp from '@/components/FloatingWhatsApp'
+import { createClient } from '@/lib/supabase/server'
 
 export const metadata = {
   title: 'The Boujee Bazaar | Minimal & Luxury Jewelry',
@@ -143,23 +145,69 @@ export const metadata = {
   keywords: 'jewelry, boujee, gold, necklace, earrings, rings, bracelets',
 }
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient()
+
+  // 1. Fetch active hero slides
+  const { data: heroSlidesData } = await supabase
+    .from('hero_slides')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+
+  // 2. Fetch categories
+  const { data: categoriesData } = await supabase
+    .from('categories')
+    .select('id, name, slug, image, description, sort_order')
+    .order('sort_order', { ascending: true })
+
+  // 3. Fetch products
+  const { data: productsData } = await supabase
+    .from('products')
+    .select('id, name, price, originalPrice, image, category, subcategory, tag, available')
+    .eq('available', true)
+
+  const rawSlides = heroSlidesData || []
+  const rawCategories = categoriesData || []
+  const rawProducts = productsData || []
+
+  // Map to unified shape for the landing page product cards
+  const allMappedProducts = rawProducts.map((p: any) => ({
+    id: p.id,
+    name: p.name,
+    image: p.image || '/assets/img/placeholder.jpeg',
+    price: p.price || 0,
+    originalPrice: p.originalPrice || undefined,
+    rating: 5.0,
+    reviewCount: 120,
+    badge: p.tag || undefined,
+    category_id: p.category?.trim().toLowerCase() || '',
+    category_name: p.category || 'Jewelry',
+    subcategory: p.subcategory?.trim().toLowerCase() || '',
+  }))
+
+  // Filter products for the specific sections
+  const newArrivals = allMappedProducts.filter(p => p.badge?.toLowerCase() === 'new' || p.id.startsWith('n'))
+  const bestSellers = allMappedProducts.filter(p => p.badge?.toLowerCase() === 'bestseller' || p.badge?.toLowerCase() === 'hot' || p.id.startsWith('b'))
+  const saleProducts = allMappedProducts.filter(p => (p.originalPrice && p.originalPrice > p.price) || p.badge?.toLowerCase() === 'sale')
+
   return (
     <>
-      <Navbar />
-      <main>
-        <Hero />
-        <Collections />
-        <Products />
-        <Trust />
+      <Header />
+      <main className="pt-24 md:pt-28">
+        <Hero slides={rawSlides} />
+        <Collections categories={rawCategories} />
+        <NewArrivals products={newArrivals} />
+        <Products products={bestSellers} />
+        <SaleSection products={saleProducts} />
         <Features />
-        <About />
         <Reviews />
         <Instagram />
         <Newsletter />
         <FAQ />
       </main>
       <Footer />
+      <FloatingWhatsApp />
     </>
   )
 }

@@ -4,7 +4,7 @@ import ProfileManager from './_components/ProfileManager'
 import { createClient } from '@/lib/supabase/server'
 
 export const metadata = {
-  title: 'My Profile | Gulshan Modest',
+  title: 'My Profile | The Boujee Bazaar',
   description: 'Manage your shipping address, contact details, and order tracking.',
 }
 

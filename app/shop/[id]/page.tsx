@@ -1,348 +1,27 @@
-// import Header from '@/components/Header'
-// import Footer from '@/components/Footer'
-// import ProductDetailActions from './_components/ProductDetailActions'
-// import ProductGallery from './_components/ProductGallery'
-// import ProductReviews from './_components/ProductReviews'
-// import Products from '@/components/Products'
-// import { notFound } from 'next/navigation'
-// import Link from 'next/link'
-// import { ChevronRight } from 'lucide-react'
-// import { createClient } from "@/lib/supabase/server"
-
-// export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
-//   const supabase = await createClient();
-//   const { id } = await params;
-
-//   // Try fetching by ID first, then fallback to slug if the URL uses a slug
-//   let { data: productData } = await supabase
-//     .from("products")
-//     .select(`
-//       id, name, slug, category_id, is_active, badge, rating, short_description, description, fabric, stitching, featured_image_url, color_group_id, color_name, color_hex,
-//       product_images ( image_url ),
-//       product_variants ( id, variant_name, price, original_price, stock_quantity ),
-//       product_information ( label, value, display_order ),
-//       product_faqs ( question, answer, display_order )
-//     `)
-//     .eq("id", id)
-//     .single();
-
-//   if (!productData) {
-//     const { data: slugProduct } = await supabase
-//       .from("products")
-//       .select(`
-//         id, name, slug, category_id, is_active, badge, rating, short_description, description, fabric, stitching, featured_image_url, color_group_id, color_name, color_hex,
-//         product_images ( image_url ),
-//         product_variants ( id, variant_name, price, original_price, stock_quantity ),
-//         product_information ( label, value, display_order ),
-//         product_faqs ( question, answer, display_order )
-//       `)
-//       .eq("slug", id)
-//       .single();
-
-//     productData = slugProduct;
-//   }
-
-//   if (!productData || !productData.is_active) notFound();
-
-//   const { data: category } = await supabase
-//     .from("categories")
-//     .select("name")
-//     .eq("id", productData.category_id)
-//     .single();
-
-//   const categoryName = category?.name || productData.category_id;
-
-//   // Compile image array
-//   let images: string[] = []
-//   if (productData.product_images && productData.product_images.length > 0) {
-//     images = productData.product_images.map((img: any) => img.image_url)
-//   } else if (productData.featured_image_url) {
-//     images = [productData.featured_image_url]
-//   }
-
-//   // Compile information
-//   let information = productData.product_information || []
-//   if (productData.fabric) {
-//     information.push({ label: 'Fabric Details', value: productData.fabric, display_order: -2 })
-//   }
-//   if (productData.stitching) {
-//     information.push({ label: 'Stitching Details', value: productData.stitching, display_order: -1 })
-//   }
-//   information.sort((a: any, b: any) => a.display_order - b.display_order)
-
-//   let faqs = productData.product_faqs || []
-//   // Add a default FAQ if none exist just to populate the section as requested
-//   if (faqs.length === 0) {
-//     faqs.push({
-//       question: "How long does shipping take?",
-//       answer: "We typically process and ship orders within 2-3 business days. Delivery times vary based on your location.",
-//       display_order: 1
-//     })
-//     faqs.push({
-//       question: "What is your return policy?",
-//       answer: "We offer a 7-day return policy for unused items in their original packaging.",
-//       display_order: 2
-//     })
-//   }
-//   faqs.sort((a: any, b: any) => a.display_order - b.display_order)
-
-//   // Filter out inactive or out-of-stock variants if we want to be strict,
-//   // but let's just pass them down and disable out-of-stock ones
-//   const variants = productData.product_variants || []
-
-//   // Fetch other colors of this same design (color group)
-//   let colorOptions: any[] = []
-//   if (productData.color_group_id) {
-//     const { data: colorGroupProducts } = await supabase
-//       .from("products")
-//       .select(`
-//         id, name, color_name, color_hex, featured_image_url,
-//         product_images ( image_url )
-//       `)
-//       .eq("color_group_id", productData.color_group_id)
-//       .eq("is_active", true)
-//       .order("created_at", { ascending: true })
-
-//     colorOptions = (colorGroupProducts || []).map((p: any) => ({
-//       id: p.id,
-//       name: p.name,
-//       color_name: p.color_name,
-//       color_hex: p.color_hex,
-//       image_url: p.product_images?.[0]?.image_url || p.featured_image_url || "/image.png",
-//     }))
-//   }
-
-//   // Fetch similar products
-//   const { data: similarProductsData } = await supabase
-//     .from("products")
-//     .select(`
-//       id, name, slug, category_id, is_active, badge, rating, featured_image_url,
-//       product_images ( image_url ),
-//       product_variants ( price, original_price )
-//     `)
-//     .eq("is_active", true)
-//     .eq("category_id", productData.category_id)
-//     .neq("id", productData.id)
-//     .limit(4);
-
-//   const similarProducts = similarProductsData?.map((p: any) => ({
-//     id: p.id,
-//     name: p.name,
-//     category_id: p.category_id,
-//     image_url: p.featured_image_url || (p.product_images?.[0]?.image_url) || "/image.png",
-//     badge: p.badge,
-//     price: p.product_variants?.[0]?.price || 0,
-//     originalPrice: p.product_variants?.[0]?.original_price || undefined
-//   })) || [];
-
-//   // Fetch Reviews
-//   const { data: reviewsData } = await supabase
-//     .from('reviews')
-//     .select(`
-//       id, rating, comment, created_at,
-//       profiles:user_id ( full_name )
-//     `)
-//     .eq('product_id', productData.id)
-//     .eq('is_approved', true)
-//     .order('created_at', { ascending: false });
-
-//   const reviews = reviewsData || [];
-
-//   return (
-//     <>
-//       <Header />
-//       <main className="min-h-screen bg-cream pt-28 pb-16 md:pt-36 md:pb-24">
-//         <div className="max-w-wrap mx-auto px-5 md:px-8">
-
-//           {/* Breadcrumbs */}
-//           <div className="flex items-center gap-1.5 text-xs text-ink/50 font-medium mb-8">
-//             <Link href="/" className="hover:text-emerald transition-colors">Home</Link>
-//             <ChevronRight className="w-3.5 h-3.5" />
-//             <Link href="/shop" className="hover:text-emerald transition-colors">Shop</Link>
-//             <ChevronRight className="w-3.5 h-3.5" />
-//             <Link href={`/shop?category=${productData.category_id}`} className="hover:text-emerald transition-colors capitalize">
-//               {categoryName}
-//             </Link>
-//             <ChevronRight className="w-3.5 h-3.5" />
-//             <span className="text-ink font-semibold truncate max-w-[200px]">{productData.name}</span>
-//           </div>
-
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
-//             {/* Left: Product Image Gallery */}
-//             <ProductGallery images={images} productName={productData.name} badge={productData.badge} />
-
-//             {/* Right: Product Details & Purchase Form */}
-//             <div className="space-y-8">
-//               <div>
-//                 <span className="text-xs uppercase tracking-wider text-gold font-bold">
-//                   {categoryName}
-//                 </span>
-//                 <h1 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-ink mt-2 leading-tight">
-//                   {productData.name}
-//                 </h1>
-                
-//                 {productData.rating && (
-//                   <div className="mt-3 flex items-center gap-1.5 text-sm text-ink/60">
-//                     <div className="flex text-gold">★★★★★</div>
-//                     <span className="font-semibold text-ink">{productData.rating} ★</span>
-//                     <span className="text-ink/30">|</span>
-//                     <span>Verified</span>
-//                   </div>
-//                 )}
-//               </div>
-
-//               {/* Color Options */}
-//               {colorOptions.length > 1 && (
-//                 <div>
-//                   <p className="text-[13px] uppercase tracking-wider font-bold text-ink/70 mb-3">
-//                     Color{productData.color_name ? ` — ${productData.color_name}` : ''}
-//                     <span className="ml-1.5 font-semibold normal-case text-emerald">
-//                       ({colorOptions.length} colors available)
-//                     </span>
-//                   </p>
-//                   <div className="flex flex-wrap gap-3">
-//                     {colorOptions.map((c) => (
-//                       <Link
-//                         key={c.id}
-//                         href={`/shop/${c.id}`}
-//                         title={c.color_name || c.name}
-//                         className={`relative w-11 h-11 rounded-full border-2 overflow-hidden shrink-0 transition-all ${
-//                           c.id === productData.id
-//                             ? 'border-emerald scale-110 shadow-sm'
-//                             : 'border-cream-line hover:border-emerald/50'
-//                         }`}
-//                         style={{ backgroundColor: c.color_hex || '#E6DAC4' }}
-//                       >
-//                         <span className="sr-only">{c.color_name || c.name}</span>
-//                       </Link>
-//                     ))}
-//                   </div>
-//                 </div>
-//               )}
-
-//               {/* Purchase Actions client-side wrapper (includes dynamic price and Add to cart) */}
-//               <ProductDetailActions 
-//                 product={{
-//                   id: productData.id,
-//                   name: productData.name,
-//                   image_url: images[0] || "/image.png",
-//                   category_name: categoryName,
-//                   variants: variants
-//                 }}
-//               />
-
-//               {productData.short_description && (
-//                 <div className="font-body text-ink/80 text-lg leading-relaxed pt-2">
-//                   <p>{productData.short_description}</p>
-//                 </div>
-//               )}
-
-//               {/* Dynamic Information Section */}
-//               {information.length > 0 && (
-//                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-cream-line/50">
-//                   {information.map((info: any, idx: number) => (
-//                     <div key={idx} className="p-4 bg-white rounded-2xl border border-cream-line shadow-sm">
-//                       <p className="text-[11px] font-bold text-ink/50 uppercase tracking-wider">{info.label}</p>
-//                       <p className="text-sm font-semibold text-emerald mt-1">{info.value}</p>
-//                     </div>
-//                   ))}
-//                 </div>
-//               )}
-
-//               {/* Long Description & FAQs */}
-//               <div className="space-y-6 pt-6 border-t border-cream-line/50">
-//                 {productData.description && (
-//                   <div>
-//                     <h3 className="font-display font-semibold text-xl text-ink mb-4">Product Details</h3>
-//                     <div className="font-body text-ink/75 text-base leading-relaxed whitespace-pre-wrap">
-//                       {productData.description}
-//                     </div>
-//                   </div>
-//                 )}
-
-//                 {faqs.length > 0 && (
-//                   <div className="pt-4">
-//                     <h3 className="font-display font-semibold text-xl text-ink mb-4">Common Questions</h3>
-//                     <div className="space-y-3">
-//                       {faqs.map((faq: any, idx: number) => (
-//                         <details key={idx} className="group bg-white rounded-2xl border border-cream-line shadow-sm overflow-hidden open:bg-cream-deep/30 transition-colors">
-//                           <summary className="font-display font-semibold text-ink text-[15px] px-5 py-4 cursor-pointer flex justify-between items-center outline-none list-none hover:text-emerald transition-colors">
-//                             {faq.question}
-//                             <span className="text-ink/50 transition-transform group-open:rotate-180 group-open:text-emerald">
-//                               <svg fill="none" height="18" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="18"><polyline points="6 9 12 15 18 9"/></svg>
-//                             </span>
-//                           </summary>
-//                           <div className="px-5 pb-5 text-ink/70 text-sm leading-relaxed border-t border-cream-line/50 mx-5 pt-3">
-//                             {faq.answer}
-//                           </div>
-//                         </details>
-//                       ))}
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-//           </div>
-
-//         </div>
-
-//         {/* Similar Products */}
-//         {similarProducts.length > 0 && (
-//           <div className="mt-20 pt-10 border-t border-cream-line">
-//             <Products
-//               products={similarProducts}
-//               categories={[{ id: productData.category_id, name: categoryName }]}
-//               title="You might also like"
-//               subtitle="Explore similar styles from this collection."
-//             />
-//           </div>
-//         )}
-
-//         {/* Product Reviews */}
-//         <section className="mt-20 pt-10 border-t border-cream-line bg-cream">
-//           <div className="max-w-wrap mx-auto px-5 md:px-8">
-//             <div className="text-center max-w-xl mx-auto mb-10">
-//               <div className="eyebrow justify-center inline-flex items-center gap-2">
-//                 <span className="h-px w-6 bg-gold" />
-//                 Customer Voices
-//                 <span className="h-px w-6 bg-gold" />
-//               </div>
-//               <h2 className="section-heading mt-4">Ratings &amp; Reviews</h2>
-//             </div>
-//             <ProductReviews productId={productData.id} initialReviews={reviews} />
-//           </div>
-//         </section>
-//       </main>
-//       <Footer />
-//     </>
-//   )
-// }
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import ShopGrid from './_components/ShopGrid'
-import { createClient } from "@/lib/supabase/server";
+import ProductDetailActions from './_components/ProductDetailActions'
+import ProductGallery from './_components/ProductGallery'
+import ProductReviews from './_components/ProductReviews'
+import RecentlyViewed from './_components/RecentlyViewed'
+import Products from '@/components/Products'
+import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import Image from 'next/image'
+import { ChevronRight } from 'lucide-react'
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata = {
-  title: 'Shop Collection | The Boujee Bazaar',
-  description: 'Browse our complete premium collection of anti-tarnish, waterproof necklaces, rings, earrings, bracelets etc.',
+  title: 'Product Details | The Boujee Bazaar',
+  description: 'Minimal, luxury, anti-tarnish jewelry designed to elevate your everyday statements.',
 }
 
-export default async function ShopPage({
-  searchParams,
-}: {
-  searchParams: any
-}) {
+export default async function ProductDetailPage({ params }: { params: any }) {
   const supabase = await createClient();
+  const { id } = await params;
 
-  // Next.js App Router requires resolving searchParams explicitly safely
-  const resolvedSearchParams = typeof searchParams?.then === 'function' ? await searchParams : searchParams;
-  const searchQuery = resolvedSearchParams?.search || '';
-  const featuredOnly = resolvedSearchParams?.featured === 'true';
-  const selectedCategory = resolvedSearchParams?.category || '';
-
-  // 1. QUERY LIVE CATALOG MATCHING YOUR EXACT SUPABASE COLUMNS
-  let productsQuery = supabase
+  // 1. Fetch product with standard jewelry columns
+  const { data: productData } = await supabase
     .from("products")
     .select(`
       id, 
@@ -357,88 +36,208 @@ export default async function ShopPage({
       sizes,
       colors,
       tag,
-      available,
-      created_at
+      available
     `)
-    .eq("available", true);
+    .eq("id", id)
+    .single();
 
-  if (searchQuery) {
-    productsQuery = productsQuery.ilike('name', `%${searchQuery}%`);
+  if (!productData || !productData.available) notFound();
+
+  // Compile image list
+  let images: string[] = []
+  if (productData.images) {
+    if (Array.isArray(productData.images)) {
+      images = productData.images
+    } else if (typeof productData.images === 'string') {
+      images = productData.images.split(',').map((img: string) => img.trim())
+    }
+  }
+  if (images.length === 0 && productData.image) {
+    images = [productData.image]
+  }
+  if (images.length === 0) {
+    images = ['/assets/img/placeholder.jpeg']
   }
 
-  if (featuredOnly) {
-    productsQuery = productsQuery.eq('is_featured', true);
+  // Build variants list from sizes if product_variants table is not used
+  let variants: any[] = []
+  if (productData.sizes) {
+    const sizeList = typeof productData.sizes === 'string' 
+      ? productData.sizes.split(',') 
+      : Array.isArray(productData.sizes) ? productData.sizes : []
+    
+    variants = sizeList.map((size: string, idx: number) => ({
+      id: `${productData.id}-${size.trim()}`,
+      variant_name: size.trim(),
+      price: productData.price,
+      original_price: productData.originalPrice || null,
+      stock_quantity: 20
+    }))
   }
 
-  const { data: productsData } = await productsQuery;
+  // Fallback variant if none
+  if (variants.length === 0) {
+    variants = [{
+      id: `${productData.id}-standard`,
+      variant_name: 'Standard',
+      price: productData.price,
+      original_price: productData.originalPrice || null,
+      stock_quantity: 20
+    }]
+  }
 
-  // 2. FETCH YOUR CATEGORIES ROWS FOR THE FRONTEND FILTER SELECTOR
-  const { data: categoriesData } = await supabase
-    .from("categories")
-    .select("*")
-    .order('sort_order', { ascending: true });
+  // Fetch similar products
+  const { data: similarProductsData } = await supabase
+    .from("products")
+    .select("id, name, price, originalPrice, image, category, tag")
+    .eq("available", true)
+    .eq("category", productData.category)
+    .neq("id", productData.id)
+    .limit(4);
 
-  // 3. ✅ SURGICAL SANITIZATION: Maps jewelry columns into expected parameters safely
-  const products = (productsData || []).map((p: any) => ({
+  const similarProducts = (similarProductsData || []).map((p: any) => ({
     id: p.id,
     name: p.name,
-    slug: p.id, // Fallback to id since jewelry table doesn't have an explicit slug column
-    category_id: p.category?.toLowerCase() || 'jewelry', 
+    category_id: p.category?.toLowerCase() || 'jewelry',
     category_name: p.category || 'Jewelry',
-    image_url: p.image || '/assets/img/placeholder.jpeg',
+    image_url: p.image || "/assets/img/placeholder.jpeg",
     price: p.price || 0,
     originalPrice: p.originalPrice || undefined,
-    badge: p.tag || undefined, // Bestseller, Hot, Premium tags
-    rating: 5.0, // Fixed fallback jewelry catalog visual metric
-    colorCount: p.colors ? p.colors.split(',').length : 1, // Dynamically counts swatches based on comma separations
+    badge: p.tag || undefined,
+    rating: 5.0,
+    colorCount: p.colors ? p.colors.split(',').length : 1
   }));
 
-  // Normalize categories parameters to keep child states from breaking
-  const categories = (categoriesData || []).map((c: any) => ({
-    id: c.id || c.name?.toLowerCase(),
-    name: c.name,
-    image: c.image || '/assets/img/placeholder.jpeg',
-    description: c.description || ''
-  }));
+  // Fetch Reviews (Fallback to empty)
+  const reviews: any[] = [];
+
+  const categoryName = productData.category || 'Jewelry';
 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-[#fff] pt-[72px] md:pt-[84px]">
-        
-        {/* Shop Hero Banner Section Frame */}
-        <section className="relative w-full h-[250px] md:h-[340px] flex items-center justify-center overflow-hidden border-b border-neutral-100 bg-neutral-900">
-          <Image
-            src="/assets/img/insta_img/insta_7.png" // Pointed directly to your public folder path asset
-            alt="The Boujee Bazaar Premium Jewelry Collection"
-            fill
-            className="object-cover opacity-40 mix-blend-overlay"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-transparent to-neutral-900/50" />
-          
-          <div className="relative z-10 text-center px-5">
-            <div className="eyebrow justify-center inline-flex items-center gap-2 mb-3 text-[#c5a880] uppercase tracking-widest text-xs font-semibold">
-              <span className="h-px w-6 bg-[#c5a880]/50" />
-              Minimal & Luxury Aesthetics
-              <span className="h-px w-6 bg-[#c5a880]/50" />
-            </div>
-            <h1 className="font-display font-bold text-4xl md:text-6xl text-white tracking-wide" style={{ fontFamily: 'Playfair Display, serif' }}>
-              Shop the Drop
-            </h1>
-            <p className="mt-3 text-neutral-300 font-body text-xs md:text-sm max-w-md mx-auto leading-relaxed">
-              Anti-tarnish • Waterproof • Hypoallergenic jewelry pieces engineered to shine every single day.
-            </p>
-          </div>
-        </section>
+      <main className="min-h-screen bg-white pt-28 pb-16 md:pt-36 md:pb-24">
+        <div className="max-w-7xl mx-auto px-5 md:px-8">
 
-        {/* Dynamic Interactive Filter Grid Workspace */}
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-10 md:py-16">
-          <ShopGrid 
-            initialProducts={products} 
-            categories={categories} 
-            selectedCategory={selectedCategory.toLowerCase()} 
-          />
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-1.5 text-xs text-neutral-400 font-medium mb-8">
+            <Link href="/" className="hover:text-[#c5a880] transition-colors">Home</Link>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <Link href="/shop" className="hover:text-[#c5a880] transition-colors">Shop</Link>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <Link href={`/shop?category=${productData.category?.toLowerCase()}`} className="hover:text-[#c5a880] transition-colors capitalize">
+              {categoryName}
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-neutral-900 font-semibold truncate max-w-[200px]">{productData.name}</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
+            {/* Left: Product Image Gallery */}
+            <ProductGallery images={images} productName={productData.name} badge={productData.tag} />
+
+            {/* Right: Product Details & Purchase Form */}
+            <div className="space-y-8">
+              <div>
+                <span className="text-xs uppercase tracking-widest text-[#c5a880] font-bold">
+                  {categoryName} {productData.subcategory && `• ${productData.subcategory}`}
+                </span>
+                <h1 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-neutral-900 mt-2 leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  {productData.name}
+                </h1>
+                
+                <div className="mt-3 flex items-center gap-1.5 text-sm text-neutral-500">
+                  <div className="flex text-[#c5a880]">★★★★★</div>
+                  <span className="font-semibold text-neutral-800">5.0 ★</span>
+                  <span className="text-neutral-200">|</span>
+                  <span>Waterproof & Anti-Tarnish</span>
+                </div>
+              </div>
+
+              {/* Purchase Actions client-side wrapper (includes dynamic price and Add to cart) */}
+              <ProductDetailActions 
+                product={{
+                  id: productData.id,
+                  name: productData.name,
+                  image_url: images[0],
+                  category_name: categoryName,
+                  variants: variants
+                }}
+              />
+
+              {productData.description && (
+                <div className="font-body text-neutral-600 text-sm leading-relaxed pt-2">
+                  <h3 className="font-semibold text-neutral-900 mb-2">Description</h3>
+                  <p className="whitespace-pre-wrap">{productData.description}</p>
+                </div>
+              )}
+
+              {/* Secure Checkout Trust Badge */}
+              <div className="p-4 bg-neutral-50 rounded-2xl border border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Secure Payment Options</span>
+                <div className="flex gap-3 text-neutral-400 text-xl">
+                  <i className="fa-brands fa-cc-visa" title="Visa"></i>
+                  <i className="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+                  <i className="fa-brands fa-cc-rupay" title="Rupay"></i>
+                  <i className="fa-solid fa-credit-card" title="UPI & Net Banking"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Similar Products */}
+          {similarProducts.length > 0 && (
+            <div className="mt-20 pt-10 border-t border-neutral-100">
+              <div className="text-center max-w-xl mx-auto mb-10">
+                <div className="eyebrow justify-center inline-flex items-center gap-2 text-[#c5a880] uppercase tracking-widest text-xs font-semibold">
+                  <span className="h-px w-6 bg-[#c5a880]/50" />
+                  Explore styles
+                  <span className="h-px w-6 bg-[#c5a880]/50" />
+                </div>
+                <h2 className="text-3xl font-display font-bold text-neutral-900 mt-3" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  You Might Also Like
+                </h2>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {similarProducts.map((p) => (
+                  <div key={p.id} className="group bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm hover:shadow-md transition-all flex flex-col">
+                    <Link href={`/shop/${p.id}`} className="relative aspect-[4/5] overflow-hidden block bg-neutral-50">
+                      <Image
+                        src={p.image_url}
+                        alt={p.name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 280px"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </Link>
+                    <div className="p-4 flex flex-col flex-1">
+                      <div className="flex-1">
+                        <Link href={`/shop/${p.id}`} className="hover:text-[#c5a880] transition-colors">
+                          <h3 className="font-semibold text-neutral-800 text-[14px] leading-snug line-clamp-2">
+                            {p.name}
+                          </h3>
+                        </Link>
+                      </div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="font-bold text-neutral-900 text-sm">
+                          ₹{p.price.toLocaleString('en-IN')}
+                        </span>
+                        {p.originalPrice && (
+                          <span className="text-neutral-400 text-xs line-through">
+                            ₹{p.originalPrice.toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recently Viewed Products */}
+          <RecentlyViewed currentProductId={productData.id} />
+
         </div>
       </main>
       <Footer />

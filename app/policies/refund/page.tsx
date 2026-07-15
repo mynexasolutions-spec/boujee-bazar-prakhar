@@ -3,7 +3,7 @@ import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 export const metadata = {
-  title: 'Refund & Cancellation Policy | Gulshan Modest',
+  title: 'Refund & Cancellation Policy | The Boujee Bazaar',
 }
 
 export default function RefundPolicy() {
