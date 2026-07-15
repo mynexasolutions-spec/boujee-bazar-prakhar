@@ -13,7 +13,7 @@ export async function getAdminProfile() {
 
   // Fetch admin profile
   const { data: admin } = await supabase
-    .from('profiles')
+    .from('users')
     .select('*')
     .eq('role', 'admin')
     .single()

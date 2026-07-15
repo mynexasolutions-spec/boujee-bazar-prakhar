@@ -24,7 +24,7 @@ export default async function EditProductPage({
     supabase
       .from('categories')
       .select('*')
-      .eq('is_active', true)
+      // .eq('is_active', true)
       .order('name'),
     supabase
       .from('products')

@@ -58,7 +58,7 @@ export default function ShippingForm({ initialShipping }: { initialShipping: any
             defaultValue={initialShipping.flat_rate ?? 99}
             required
             min="0"
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-teal-700 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-[#c5a880] transition-all"
           />
           <Truck className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-stone-400" />
         </div>
@@ -75,7 +75,7 @@ export default function ShippingForm({ initialShipping }: { initialShipping: any
             defaultValue={initialShipping.free_threshold ?? 1999}
             required
             min="0"
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-teal-700 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-[#c5a880] transition-all"
           />
           <CircleDollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-stone-400" />
         </div>
@@ -92,7 +92,7 @@ export default function ShippingForm({ initialShipping }: { initialShipping: any
             defaultValue={initialShipping.cod_charge ?? 50}
             required
             min="0"
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-teal-700 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-[#c5a880] transition-all"
           />
           <CircleDollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-stone-400" />
         </div>
@@ -110,7 +110,7 @@ export default function ShippingForm({ initialShipping }: { initialShipping: any
             required
             min="0"
             max="100"
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-teal-700 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-[#c5a880] transition-all"
           />
           <CircleDollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-stone-400" />
         </div>

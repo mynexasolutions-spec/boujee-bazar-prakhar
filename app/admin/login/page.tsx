@@ -61,7 +61,7 @@
 //                 autoComplete="email"
 //                 required
 //                 placeholder="admin@boujeebazaar.in"
-//                 className="w-full px-4 py-2.5 rounded-xl border border-[#E6DAC4] bg-white text-ink placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-teal-700 transition-all duration-200"
+//                 className="w-full px-4 py-2.5 rounded-xl border border-[#E6DAC4] bg-white text-ink placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-[#c5a880] transition-all duration-200"
 //               />
 //             </div>
  
@@ -80,7 +80,7 @@
 //                   autoComplete="current-password"
 //                   required
 //                   placeholder="••••••••"
-//                   className="w-full px-4 py-2.5 rounded-xl border border-[#E6DAC4] bg-white text-ink placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-teal-700 transition-all duration-200 pr-11"
+//                   className="w-full px-4 py-2.5 rounded-xl border border-[#E6DAC4] bg-white text-ink placeholder:text-ink/30 focus:outline-none focus:ring-2 focus:ring-teal-700/40 focus:border-[#c5a880] transition-all duration-200 pr-11"
 //                 />
 //                 <button
 //                   type="button"

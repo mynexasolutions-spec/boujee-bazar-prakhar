@@ -59,7 +59,7 @@ export default function CouponForm() {
             name="code"
             required
             placeholder="e.g. FESTIVE200"
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-700/30"
+            className="w-full pl-9 pr-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 "
           />
           <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
         </div>
@@ -72,7 +72,7 @@ export default function CouponForm() {
           </label>
           <select
             name="type"
-            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-700/30"
+            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 "
           >
             <option value="percentage">Percentage (%)</option>
             <option value="flat">Flat Value (₹)</option>
@@ -88,7 +88,7 @@ export default function CouponForm() {
             required
             min="1"
             placeholder="e.g. 10 or 150"
-            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-700/30"
+            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 "
           />
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function CouponForm() {
             required
             min="0"
             placeholder="e.g. 499"
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-700/30"
+            className="w-full pl-9 pr-3 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 "
           />
           <CircleDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
         </div>

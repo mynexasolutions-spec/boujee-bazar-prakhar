@@ -32,7 +32,7 @@ const navItems = [
   { label: 'Hero Slides', href: '/admin/hero-slides', icon: Image },
   { label: 'Announcements', href: '/admin/announcements', icon: Megaphone },
   { label: 'Global FAQs', href: '/admin/settings/faqs', icon: Settings },
-  { label: 'Shipping Settings', href: '/admin/settings/shipping', icon: Truck },
+  // { label: 'Shipping Settings', href: '/admin/settings/shipping', icon: Truck },
   { label: 'Manage Coupons', href: '/admin/settings/coupons', icon: Tag },
   { label: 'Manage Profile', href: '/admin/settings/profile', icon: User },
 ]

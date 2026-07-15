@@ -44,13 +44,13 @@ async function getStats() {
       // A. Query your orders table cleanly
       supabase
         .from('orders')
-        .select('id, total_amount', { count: 'exact', head: false }),
+        .select('id, total', { count: 'exact', head: false }),
 
       // B. 🌟 FIXED: Points to your true 'users' table and filters out admin operators
       supabase
         .from('users')
         .select('id', { count: 'exact', head: true })
-        .or('is_admin.eq.false,is_admin.is.null'),
+        .or('is_admin.eq.false'),
 
       // C. Query your jewelry products inventory catalog count cleanly
       supabase
@@ -60,10 +60,13 @@ async function getStats() {
       // D. Query your recent orders log list matching your direct row schema
       supabase
         .from('orders')
-        .select('id, order_number, total_amount, order_status, payment_status, created_at')
+        .select('id, order_number, total, order_status, payment_status, created_at')
         .order('created_at', { ascending: false })
         .limit(5),
     ])
+    console.log("ordersRes.data:", ordersRes.data)
+console.log("ordersRes.count:", ordersRes.count)
+console.log("ordersRes.error:", ordersRes.error)
 
 
   // 1. Safe order count checker
@@ -213,7 +216,7 @@ export default async function AdminDashboardPage() {
                       #{order.order_number}
                     </td>
                     <td className="px-6 py-3.5 text-sm text-stone-700">
-                      ₹{Number(order.total_amount).toLocaleString('en-IN')}
+                      ₹{Number(order.total).toLocaleString('en-IN')}
                     </td>
                     <td className="px-6 py-3.5">
                       <span

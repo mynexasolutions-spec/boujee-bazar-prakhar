@@ -1,4 +1,4 @@
-import { getAnnouncement } from '@/actions/admin/announcements'
+import {  getCompleteStoreConfig } from '@/actions/admin/announcements'
 import { AnnouncementForm } from './_components/AnnouncementForm'
 
 export const metadata = {
@@ -6,7 +6,7 @@ export const metadata = {
 }
 
 export default async function AdminAnnouncementsPage() {
-  const announcement = await getAnnouncement()
+  const announcement = await  getCompleteStoreConfig()
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -18,8 +18,8 @@ export default async function AdminAnnouncementsPage() {
       </div>
 
       <AnnouncementForm 
-        initialMessage={announcement?.message || ''} 
-        initialIsActive={announcement?.is_active || false} 
+        initialData={announcement}
+
       />
     </div>
   )

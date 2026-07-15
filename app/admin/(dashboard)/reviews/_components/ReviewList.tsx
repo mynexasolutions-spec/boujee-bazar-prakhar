@@ -98,7 +98,7 @@ export function ReviewList({ initialReviews }: { initialReviews: Review[] }) {
                     {[...Array(5)].map((_, i) => (
                       <Star 
                         key={i} 
-                        className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-orange-400 text-orange-400' : 'text-stone-200'}`} 
+                        className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-[#c5a880] text-[#c5a880]' : 'text-stone-200'}`}
                       />
                     ))}
                   </div>
