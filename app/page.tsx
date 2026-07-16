@@ -131,8 +131,10 @@ import NewArrivals from '@/components/NewArrivals'
 import Products from '@/components/Products'
 import SaleSection from '@/components/SaleSection'
 import Features from '@/components/Features'
+import Aboutp from '@/components/aboutp'
 import Reviews from '@/components/Reviews'
 import Instagram from '@/components/Instagram'
+import Edition from '@/components/Edition'
 import Newsletter from '@/components/Newsletter'
 import FAQ from '@/components/FAQ'
 import Footer from '@/components/Footer'
@@ -199,8 +201,11 @@ export default async function Home() {
         <Collections categories={rawCategories} />
         <NewArrivals products={newArrivals} />
         <Products products={bestSellers} />
-        <SaleSection products={saleProducts} />
+        
+        <Edition />
+        {/* <SaleSection products={saleProducts} /> */}
         <Features />
+        <Aboutp />
         <Reviews />
         <Instagram />
         <Newsletter />

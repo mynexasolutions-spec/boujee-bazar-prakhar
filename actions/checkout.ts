@@ -340,13 +340,12 @@
 // }
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { createAdminClient } from '@/lib/supabase/admin' // 🌟 FIXED: Superuser bypasses RLS
 import Razorpay from 'razorpay'
 import crypto from 'crypto'
 
-// Initialize Razorpay securely
 let razorpayInstance: any = null
 try {
   if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
@@ -360,15 +359,19 @@ try {
 }
 
 export async function createOrder(addressData: any, paymentMethod: string, cartItemsFromFrontend: any[]) {
-  const supabase = await createClient()
+  // 🌟 FIXED: Instantiate the Admin superuser bypass client to allow direct data writes
+  const supabaseAdmin = createAdminClient()
   
-  // Safe authentication wrapper to prevent blocking guest checkouts
-  let userId = 'guest-session'
+  let userId = null
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) userId = user.id
+    const cookieStore = await cookies()
+    const sessionCookie = cookieStore.get('boujee-user-session')?.value
+    if (sessionCookie) {
+      const parsed = JSON.parse(decodeURIComponent(sessionCookie))
+      userId = parsed.id || null
+    }
   } catch {
-    // Guest fallback applied safely
+    console.warn("Session read exception caught safely.")
   }
 
   if (!cartItemsFromFrontend || cartItemsFromFrontend.length === 0) {
@@ -383,42 +386,59 @@ export async function createOrder(addressData: any, paymentMethod: string, cartI
     subtotal += (price * quantity)
   }
 
-  // Baseline delivery fee thresholds from your parameters
   const shipping_cost = subtotal >= 1499 ? 0 : 99
   const cod_cost = paymentMethod === 'COD' ? 50 : 0
   const total_amount = subtotal + shipping_cost + cod_cost
 
-  // Generate a premium random order string number identifier
   const order_number = `BB-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
-  const actualPaymentMethod = paymentMethod === 'RAZORPAY' ? 'Online Payment (Razorpay)' : 'Cash on Delivery'
-
-  // 1. ✅ DATABASE BYPASS: Create a safe mock order instance object to support missing relational tables
   const orderMockId = crypto.randomUUID()
 
-  // 2. Safe Try/Catch: Attempt logging the order to Supabase if tables exist, but never crash if they are absent
+  // 🌟 FIXED: Formulate transaction write using your master Admin bypass token directly
   try {
-    /*  FIX: Ensure your save script points to orders_all too! */
-await supabase.from('orders').insert([{
-  id: orderMockId,
-  user_id: userId,
-  subtotal,
-  shipping_fee: shipping_cost, // Maps to your 'shipping_f' column layout prefix from the image
-  total: total_amount,         // Maps to your 'total' column shape
-  status: 'pending'            // Maps to your 'status' column shape
-}])
+    const { error: orderInsertError } = await supabaseAdmin
+  .from('orders')
+  .insert([{
+    id: orderMockId,
+    user_id: userId,
 
-  } catch (dbErr) {
-    console.warn("Orders table logging skipped. Bypassed safely using direct checkout streams.")
+    customer_name: addressData.fullName || addressData.full_name || 'Premium Collector',
+    customer_email: addressData.email || '',
+    customer_phone: addressData.phone || '',
+
+    shipping_address: `${addressData.street}, ${addressData.city}, ${addressData.state} - ${addressData.zipCode}`,
+
+    items: cartItemsFromFrontend,
+
+    subtotal: subtotal,
+    shipping_fee: shipping_cost,
+    discount: 0,
+    coupon_code: null,
+    total: total_amount,
+
+    payment_method: paymentMethod === 'RAZORPAY' ? 'Razorpay Online' : 'COD',
+    payment_status: paymentMethod === 'RAZORPAY' ? 'pending' : 'pending',
+    status: 'pending',
+    notes: null,
+  }])
+
+    if (orderInsertError) {
+      console.error("Critical Supabase Orders insert crash:", orderInsertError.message)
+      return { success: false, error: `Database Write Error: ${orderInsertError.message}` }
+    }
+
+  } catch (dbErr: any) {
+    console.error("Orders transaction catch error block:", dbErr)
+    return { success: false, error: 'Failed to write order record down into Cloud tables.' }
   }
 
-  // 3. Handle Razorpay Specific Request Logic Pipelines
+  // Handle Razorpay Specific Request Logic Pipelines
   if (paymentMethod === 'RAZORPAY') {
     if (!razorpayInstance) {
       return { success: false, error: 'Razorpay payment gateway is not configured on the server environment.' }
     }
     try {
       const options = {
-        amount: Math.round(total_amount * 100), // Razorpay handles amounts in paise (multiply by 100)
+        amount: Math.round(total_amount * 100),
         currency: 'INR',
         receipt: orderMockId,
         payment_capture: 1
@@ -438,7 +458,7 @@ await supabase.from('orders').insert([{
     }
   }
 
-  // 4. If Cash on Delivery, flush cookie cart tokens immediately
+  // If Cash on Delivery, flush cookie cart tokens immediately
   const cookieStore = await cookies()
   cookieStore.delete('boujee-cart-token')
   cookieStore.delete('cart')
@@ -463,7 +483,6 @@ export async function verifyRazorpayPayment(
   const secret = process.env.RAZORPAY_KEY_SECRET
   if (!secret) return { success: false, error: 'Razorpay secret key token is not configured on your server.' }
 
-  // Verify webhook token authenticity
   const generated_signature = crypto
     .createHmac('sha256', secret)
     .update(razorpay_order_id + '|' + rayorpay_payment_id)
@@ -473,15 +492,14 @@ export async function verifyRazorpayPayment(
     return { success: false, error: 'Payment signature verification failed. Untrusted source transaction.' }
   }
 
-  // Safe status updating on orders tables if available
+  // Safe status updating on orders tables via admin client bypass
   try {
-    const supabase = await createClient()
-    await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', internal_order_id)
-  } catch {
-    // Gracefully handle table bypasses
+    const supabaseAdmin = createAdminClient()
+    await supabaseAdmin.from('orders').update({ status: 'paid' }).eq('id', internal_order_id)
+  } catch (err) {
+    console.error("Failed adjusting payment confirmation flags on live table:", err)
   }
 
-  // Flush cookie tokens on successful authorization
   const cookieStore = await cookies()
   cookieStore.delete('boujee-cart-token')
   cookieStore.delete('cart')
@@ -496,10 +514,9 @@ export async function processCheckout(
   items: any[],
   paymentMethod: 'COD' | 'RAZORPAY'
 ) {
-  // 1. Save shipping configuration data directly into cookies so it handles guest forms effortlessly
   const cookieStore = await cookies()
   cookieStore.set('boujee-customer-profile-token', encodeURIComponent(JSON.stringify(profile)), { path: '/', maxAge: 60 * 60 * 24 * 7 })
-
-  // 2. Clear out missing table joins and call createOrder directly using memory calculations
   return await createOrder(profile, paymentMethod, items)
 }
+
+
