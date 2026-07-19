@@ -1,7 +1,8 @@
 'use client'
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface Category {
   id: string
@@ -11,6 +12,7 @@ interface Category {
 
 export default function Collections({ categories: dbCategories }: { categories?: Category[] }) {
   const router = useRouter()
+  const scrollRef = useRef<HTMLDivElement>(null)
   
   const mockCollections = [
     {
@@ -39,19 +41,14 @@ export default function Collections({ categories: dbCategories }: { categories?:
       image: 'https://images.pexels.com/photos/2735970/pexels-photo-2735970.jpeg?auto=compress&cs=tinysrgb&w=400',
     },
     {
-      name: 'Pendants',
-      slug: 'pendants',
-      image: 'https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg?auto=compress&cs=tinysrgb&w=400',
+      name: 'Accessories',
+      slug: 'accessories',
+      image: 'https://images.pexels.com/photos/3310695/pexels-photo-3310695.jpeg?auto=compress&cs=tinysrgb&w=400',
     },
     {
-      name: 'Chains',
-      slug: 'chains',
-      image: 'https://images.pexels.com/photos/5409664/pexels-photo-5409664.jpeg?auto=compress&cs=tinysrgb&w=400',
-    },
-    {
-      name: 'Sets',
-      slug: 'sets-combos',
-      image: 'https://images.pexels.com/photos/837265/pexels-photo-837265.jpeg?auto=compress&cs=tinysrgb&w=400',
+      name: 'Watches',
+      slug: 'watches',
+      image: 'https://images.pexels.com/photos/2783873/pexels-photo-2783873.jpeg?auto=compress&cs=tinysrgb&w=400',
     },
   ]
 
@@ -67,40 +64,117 @@ export default function Collections({ categories: dbCategories }: { categories?:
     router.push(`/shop?category=${slug}`)
   }
 
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' })
+    }
+  }
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' })
+    }
+  }
+
+  // Perfectly symmetrical 8-petal scalloped shape
+  const scallopedMask = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 50 5 C 65 -5, 80 10, 85 20 C 100 20, 105 40, 95 50 C 105 60, 100 80, 85 80 C 80 90, 65 105, 50 95 C 35 105, 20 90, 15 80 C 0 80, -5 60, 5 50 C -5 40, 0 20, 15 20 C 20 10, 35 -5, 50 5 Z" /></svg>')`
+
   return (
-    <section className="collections">
-      {/* Section Title - from index.html */}
-      <h2 className="section-title">
-        SHOP BY <span className="highlight-text">COLLECTION</span> ✨
-      </h2>
-
-      {/* Collection Grid - from index.html */}
-      <div className="collection-grid">
-        {collections.map((collection) => (
-          <div 
-            key={collection.name} 
-            className="collection-item" 
-            onClick={() => handleCollectionClick(collection.slug)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="collection-img">
-              <img
-                src={collection.image}
-                alt={collection.name}
-              />
-            </div>
-            <span>{collection.name}</span>
-          </div>
-        ))}
-
+    <section className="w-full py-16 md:py-20 bg-white overflow-hidden relative">
+      <div className="w-full max-w-[1500px] mx-auto px-4 md:px-12">
         
-      </div>
+        {/* Original Section Title */}
+        <div className="flex flex-col items-center justify-center mb-12">
+          <h2 className="text-[22px] md:text-[27px] font-[800] tracking-[2px] flex flex-wrap items-center justify-center gap-x-[10px] text-neutral-900 font-['Poppins'] uppercase text-center">
+            SHOP BY <span className="text-[#f5a24a] italic font-['Playfair_Display']">COLLECTION</span> ✨
+          </h2>
+        </div>
 
-      {/* View All Button - from index.html */}
-      <div className="view-all-container">
-        <button className="btn-secondary" onClick={() => router.push('/shop')}>
-          VIEW ALL COLLECTIONS <i className="fa-solid fa-arrow-right"></i>
-        </button>
+        {/* Slider Container with Arrows */}
+        <div className="relative group">
+          
+          {/* Left Arrow */}
+          <button 
+            onClick={scrollLeft}
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-md border border-neutral-100 flex items-center justify-center text-neutral-600 hover:text-[#f5a24a] z-20 transition-colors"
+            aria-label="Scroll left"
+          >
+            <i className="fa-solid fa-chevron-left"></i>
+          </button>
+
+          {/* Right Arrow */}
+          <button 
+            onClick={scrollRight}
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-md border border-neutral-100 flex items-center justify-center text-neutral-600 hover:text-[#f5a24a] z-20 transition-colors"
+            aria-label="Scroll right"
+          >
+            <i className="fa-solid fa-chevron-right"></i>
+          </button>
+
+          <div 
+            ref={scrollRef}
+            className="flex gap-4 sm:gap-8 md:gap-14 items-center overflow-x-auto snap-x snap-mandatory scrollbar-hide py-4 px-4 md:px-12 w-full"
+            style={{ 
+              scrollbarWidth: 'none', 
+              msOverflowStyle: 'none',
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)',
+              maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)'
+            }}
+          >
+            <style jsx>{`
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            
+            {collections.map((collection, idx) => (
+              <div 
+                key={`${collection.name}-${idx}`} 
+                className="relative w-[100px] h-[100px] sm:w-[130px] sm:h-[130px] md:w-[200px] md:h-[200px] flex-shrink-0 cursor-pointer group snap-center"
+                onClick={() => handleCollectionClick(collection.slug)}
+              >
+                {/* Image with symmetrical scalloped floral mask */}
+                <div 
+                  className="w-full h-full bg-neutral-100 transition-transform duration-500 group-hover:scale-105"
+                  style={{
+                    WebkitMaskImage: scallopedMask,
+                    WebkitMaskSize: 'contain',
+                    WebkitMaskPosition: 'center',
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskImage: scallopedMask,
+                    maskSize: 'contain',
+                    maskPosition: 'center',
+                    maskRepeat: 'no-repeat',
+                  }}
+                >
+                  <img
+                    src={collection.image}
+                    alt={collection.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* Theme-colored Banner */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115%] h-[28px] sm:h-[34px] md:h-[48px] bg-[#f5a24a]/90 flex items-center justify-center shadow-sm z-10 transition-transform duration-500 group-hover:scale-110">
+                  <span className="font-['Playfair_Display'] italic text-white text-[14px] sm:text-[16px] md:text-[24px] tracking-wide" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}>
+                    {collection.name}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* View All Button */}
+        <div className="flex justify-center mt-12">
+          <button 
+            className="px-8 py-3 bg-[#f5a24a] text-white font-bold text-[13px] tracking-widest uppercase hover:bg-[#e08e36] transition-colors shadow-md flex items-center justify-center rounded-sm" 
+            onClick={() => router.push('/shop')}
+          >
+            VIEW ALL COLLECTIONS
+          </button>
+        </div>
+
       </div>
     </section>
   )

@@ -596,10 +596,12 @@ useEffect(() => {
     { id: "watches", name: "Watches" }
   ];
 
+  const isHome = pathname === '/';
+
   return (
     <>
       <header className={`fixed top-0 inset-x-0 z-[99999] transition-all duration-300 ${
-        open ? "bg-white" : scrolled ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-neutral-100" : "bg-transparent"
+        open ? "bg-white" : scrolled ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-neutral-100" : isHome ? "bg-transparent" : "bg-white border-b border-neutral-100"
       }`} style={{ fontFamily: 'Poppins, sans-serif' }}>
         
         {/* 🌟 UI MATCH: Top Announcement Bar styled with minimal black backgrounds from your HTML */}
@@ -611,7 +613,7 @@ useEffect(() => {
   </div>
 )}
         {/* Main Navbar Core */}
-        <div className="max-w-7xl mx-auto px-5 md:px-8 flex items-center justify-between h-[72px] md:h-[84px] relative border-b border-neutral-100">
+        <div className="w-full px-5 md:px-10 flex items-center justify-between h-[72px] md:h-[84px] relative">
           {/* Mobile hamburger — Left side on mobile viewports */}
           <button
             aria-label={open ? "Close menu" : "Open menu"}
@@ -691,7 +693,7 @@ useEffect(() => {
                 placeholder="Search jewels..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-44 bg-neutral-50 border border-neutral-200 rounded-full py-1.5 pl-4 pr-9 text-xs focus:outline-none focus:ring-1 focus:ring-[#c5a880] focus:border-[#c5a880] transition-all placeholder:text-neutral-400 font-medium"
+                className="w-44 bg-neutral-100 border border-neutral-300 rounded-full py-1.5 pl-4 pr-9 text-xs focus:outline-none focus:ring-1 focus:ring-[#c5a880] focus:border-[#c5a880] transition-all placeholder:text-neutral-500 font-medium text-neutral-900 shadow-inner"
               />
               <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[#c5a880] transition-colors">
                 <Search className="w-3.5 h-3.5" />

@@ -216,13 +216,13 @@ export default async function ShopPage({
         {/* Luxury Shop Hero Banner Frame */}
         <section className="relative w-full h-[250px] md:h-[340px] flex items-center justify-center overflow-hidden border-b border-neutral-100 bg-neutral-900">
           <Image
-            src="/assets/img/insta_img/insta_7.png" // Pointed directly to your public folder path asset
+            src="/assets/img/slider_1.jpeg" // Using a stronger image for banner
             alt="The Boujee Bazaar Premium Jewelry Collection"
             fill
-            className="object-cover opacity-40 mix-blend-overlay"
+            className="object-cover opacity-70"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-transparent to-neutral-900/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/60" />
           
           <div className="relative z-10 text-center px-5">
             <div className="eyebrow justify-center inline-flex items-center gap-2 mb-3 text-[#c5a880] uppercase tracking-widest text-xs font-semibold">
@@ -240,7 +240,7 @@ export default async function ShopPage({
         </section>
 
         {/* Dynamic Interactive Filter Grid Workspace */}
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-10 md:py-16">
+        <div className="w-full px-5 md:px-10 py-10 md:py-16">
           <ShopGrid 
             initialProducts={products} 
             categories={categories} 

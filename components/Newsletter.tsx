@@ -22,9 +22,11 @@ export default function Newsletter() {
     <section className="newsletter-banner">
       {/* Newsletter Content - from index.html */}
       <div className="newsletter-content">
-        <h2>
-          JOIN THE <span className="highlight-text">BOUJEE</span> FAMILY ✨
-        </h2>
+        <div className="flex flex-col items-center justify-center mb-6">
+          <h2 className="text-[22px] md:text-[27px] font-[800] tracking-[2px] flex flex-wrap items-center justify-center gap-x-[10px] text-neutral-900 font-['Poppins'] uppercase text-center">
+            JOIN THE <span className="text-[#f5a24a] italic font-['Playfair_Display']">BOUJEE</span> FAMILY ✨
+          </h2>
+        </div>
         <p>
           Subscribe to receive 10% off your first order, exclusive access to
           new drops, and styling tips.

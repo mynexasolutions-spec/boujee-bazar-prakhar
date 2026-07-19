@@ -9,9 +9,12 @@ interface Product {
   name: string
   image: string
   price: number
+  originalPrice?: number
+  badge?: string
+  category_name?: string
+  colorCount?: number
   rating: number
   reviewCount: number
-  badge?: string
 }
 
 export default function NewArrivals({ products: dbProducts }: { products?: Product[] }) {
@@ -96,20 +99,23 @@ export default function NewArrivals({ products: dbProducts }: { products?: Produ
   }, [])
 
   return (
-    <section className="new-arrivals" style={{ padding: '60px 40px', margin: '20px 40px', background: '#faf8f5', borderRadius: '30px' }}>
-      <div className="section-header" style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h2 className="section-title" style={{ margin: 0 }}>NEW ARRIVALS ✨</h2>
-        <a href="/shop?filter=new-arrivals" className="view-all-link" style={{ fontSize: '13px', fontWeight: 'bold', color: 'var(--primary)' }}>
-          VIEW ALL <i className="fa-solid fa-arrow-right"></i>
-        </a>
-      </div>
-
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p>Loading new arrivals...</p>
+    <section className="w-full py-16 md:py-20 bg-white overflow-hidden relative">
+      <div className="w-full max-w-[1500px] mx-auto px-4 md:px-12">
+        {/* Section Header */}
+        <div className="flex flex-col items-center justify-center mb-12">
+          <h2 className="text-[22px] md:text-[27px] font-[800] tracking-[2px] flex flex-wrap items-center justify-center gap-x-[10px] text-neutral-900 font-['Poppins'] uppercase text-center">
+            NEW <span className="text-[#f5a24a] italic font-['Playfair_Display']">ARRIVALS</span> ✨
+          </h2>
+          <p className="mt-2 text-neutral-500 text-[14px] font-medium tracking-wide">Fresh pieces just landed, discover the latest trends.</p>
         </div>
-      ) : (
-        <div className="products-grid">
+
+        {/* Products Grid */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <p>Loading new arrivals...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 w-full">
           {products.map(product => (
             <ProductCard
               key={product.id}
@@ -119,10 +125,25 @@ export default function NewArrivals({ products: dbProducts }: { products?: Produ
               price={product.price}
               rating={product.rating}
               reviewCount={product.reviewCount}
+              originalPrice={product.originalPrice}
+              category_name={product.category_name}
+              badge={product.badge}
+              colorCount={product.colorCount}
             />
           ))}
+          </div>
+        )}
+
+        {/* View All Button */}
+        <div className="flex justify-center mt-12">
+          <a 
+            href="/shop?filter=new-arrivals"
+            className="px-8 py-3 bg-[#f5a24a] text-white font-bold text-[13px] tracking-widest uppercase hover:bg-[#e08e36] transition-colors shadow-md flex items-center justify-center rounded-sm" 
+          >
+            VIEW ALL
+          </a>
         </div>
-      )}
+      </div>
     </section>
   )
 }

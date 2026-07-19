@@ -70,7 +70,6 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'The Boujee Bazaar',
   description: 'Minimal & Luxury Jewelry - Anti-tarnish, waterproof, hypoallergenic jewelry for the modern woman',
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
     title: 'The Boujee Bazaar',
@@ -79,13 +78,19 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="overflow-x-hidden">
       <head>
         {/* Preconnect for Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -97,7 +102,7 @@ export default function RootLayout({
         
         {/* Google Fonts - Boujee fonts */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Great+Vibes&display=swap"
           rel="stylesheet"
         />
 
@@ -108,7 +113,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body>
+      <body className="overflow-x-hidden w-full antialiased bg-white">
          {/* <AuthProvider>  */}
           <ToastProvider>
             <WishlistProvider>

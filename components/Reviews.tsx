@@ -43,57 +43,60 @@ export default function Reviews() {
   ]
 
   return (
-    <section className="customer-reviews bestsellers">
-      {/* Section Title - from index.html */}
-      <h2 className="section-title text-center">
-        LOVED BY <span className="highlight-text">YOU</span> ✨
-      </h2>
+    <section className="w-full py-16 md:py-20 bg-white overflow-hidden relative">
+      <div className="w-full max-w-[1500px] mx-auto px-4 md:px-12">
+        <div className="flex flex-col items-center justify-center mb-12">
+          <h2 className="text-[22px] md:text-[27px] font-[800] tracking-[2px] flex flex-wrap items-center justify-center gap-x-[10px] text-neutral-900 font-['Poppins'] uppercase text-center">
+            LOVED BY <span className="text-[#f5a24a] italic font-['Playfair_Display']">YOU</span> ✨
+          </h2>
+        </div>
 
-      {/* Reviews Slider Container - from index.html */}
-      <div className="reviews-slider-container">
-        <div className="reviews-track" id="reviewsTrack">
-          {/* Original Reviews */}
-          {reviews.map((review, idx) => (
-            <div key={idx} className="review-card">
-              {/* Review Rating - from index.html */}
-              <div className="review-rating">
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
+        {/* Reviews Slider Container - from index.html */}
+        <div className="reviews-slider-container">
+          <div className="reviews-track" id="reviewsTrack">
+            {/* Original Reviews */}
+            {reviews.map((review, idx) => (
+              <div key={idx} className="review-card">
+                {/* Review Rating - from index.html */}
+                <div className="review-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                </div>
+
+                {/* Review Text - from index.html */}
+                <p className="review-text">"{review.text}"</p>
+
+                {/* Reviewer Info - from index.html */}
+                <div className="reviewer-info">
+                  <img src={review.image} alt={review.reviewer} />
+                  <span>{review.reviewer}</span>
+                </div>
               </div>
+            ))}
 
-              {/* Review Text - from index.html */}
-              <p className="review-text">"{review.text}"</p>
+            {/* Duplicated Reviews for Infinite Loop - from index.html */}
+            {reviews.map((review, idx) => (
+              <div key={`dup-${idx}`} className="review-card">
+                <div className="review-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                </div>
 
-              {/* Reviewer Info - from index.html */}
-              <div className="reviewer-info">
-                <img src={review.image} alt={review.reviewer} />
-                <span>{review.reviewer}</span>
+                <p className="review-text">"{review.text}"</p>
+
+                <div className="reviewer-info">
+                  <img src={review.image} alt={review.reviewer} />
+                  <span>{review.reviewer}</span>
+                </div>
               </div>
-            </div>
-          ))}
-
-          {/* Duplicated Reviews for Infinite Loop - from index.html */}
-          {reviews.map((review, idx) => (
-            <div key={`dup-${idx}`} className="review-card">
-              <div className="review-rating">
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-                <i className="fa-solid fa-star"></i>
-              </div>
-
-              <p className="review-text">"{review.text}"</p>
-
-              <div className="reviewer-info">
-                <img src={review.image} alt={review.reviewer} />
-                <span>{review.reviewer}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

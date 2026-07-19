@@ -12,7 +12,7 @@ export default function LimitedEdition() {
 
   return (
     // 🌟 EXACT STRUCTURE MATCH: Restored your clean class tokens natively
-    <section className="limited-edition hero-slider w-full select-none">
+    <section className="limited-edition hero-slider select-none">
       <div className="slides-container">
         <div className="slide active">
           
