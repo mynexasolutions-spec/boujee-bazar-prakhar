@@ -141,13 +141,13 @@ export default function CartDrawer({ isOpen, onClose, shipping }: CartDrawerProp
                 <Link
                   href="/checkout"
                   onClick={onClose}
-                  className="w-full text-center py-3.5 bg-emerald text-cream font-body font-semibold rounded-full shadow-card hover:bg-emerald-deep transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full text-center py-3.5 !bg-[#DCB980] !text-black font-body font-semibold rounded-full shadow-card hover:bg-[#c9a46a] transition-all flex items-center justify-center gap-1.5"
                 >
                   Proceed to Checkout
                 </Link>
                 <button
                   onClick={onClose}
-                  className="w-full text-center py-2.5 text-xs text-ink/50 hover:text-emerald font-semibold transition-colors"
+                  className="w-full text-center py-2.5 text-xs text-ink/50 hover:text-[#DCB980] font-semibold transition-colors"
                 >
                   Continue Shopping
                 </button>

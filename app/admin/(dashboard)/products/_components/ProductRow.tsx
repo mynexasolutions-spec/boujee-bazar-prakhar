@@ -122,7 +122,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Pencil, Trash2, Loader2 } from 'lucide-react'
+import { Pencil, Trash2, Loader2, AlertTriangle } from 'lucide-react' // 💡 Added AlertTriangle icon import
 import { deleteProduct, updateProductPlacementStatus } from '@/actions/products'
 import { useState, useTransition } from 'react'
 
@@ -142,12 +142,16 @@ export default function ProductRow({
   if (deleted) return null
 
   const displayImage = product.image || product.featured_image_url
+  
+  // ✅ 1. Safe parsing of the inventory stock level parameter
+  const stockLevel = product.stock !== null && product.stock !== undefined ? Number(product.stock) : 99
 
   const handleToggleStatus = (field: 'is_new_arrival' | 'is_best_seller', currentVal: boolean, setStatus: (v: boolean) => void) => {
     const newVal = !currentVal
     setStatus(newVal) // Instant local state switch for optimistic UI feedback
 
-    startToggleTransition(async () => {
+    startTransition(async () => {
+      // Corrected from startToggleTransition to use standard component pending state hooks cleanly
       const res = await updateProductPlacementStatus(product.id, field, newVal)
       if (!res.success) {
         setStatus(currentVal) // Revert back on database write failure
@@ -161,19 +165,51 @@ export default function ProductRow({
       {/* Product Image & Title Info Column */}
       <td className="px-6 py-3.5">
         <div className="flex items-center gap-3">
-          {displayImage ? (
-            <img
-              src={displayImage}
-              alt={product.name}
-              className="w-10 h-10 rounded-lg object-cover bg-stone-100"
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center text-stone-400 text-xs font-medium">
-              IMG
-            </div>
-          )}
+          
+          {/* ✅ 2. FIXED: Wrapped image block inside a relative anchor to enable absolute warning overlays */}
+          <div className="relative w-10 h-10 shrink-0">
+            {displayImage ? (
+              <img
+                src={displayImage}
+                alt={product.name}
+                className="w-10 h-10 rounded-lg object-cover bg-stone-100"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center text-stone-400 text-xs font-medium">
+                IMG
+              </div>
+            )}
+
+            {/* ✅ 3. FIXED: Conditional rendering logic for low stock alert badge overlays */}
+            {stockLevel < 5 ? (
+              /* CRITICAL ALERT TIER: Stock under 5 triggers a bright red background mark */
+              <div 
+                className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 border-2 border-white rounded-full flex items-center justify-center shadow-sm animate-pulse z-10"
+                title={`Critical Inventory: Only ${stockLevel} items remaining!`}
+              >
+                <AlertTriangle className="w-2.5 h-2.5 text-white stroke-[3]" />
+              </div>
+            ) : stockLevel < 10 ? (
+              /* WARNING ALERT TIER: Stock between 5 and 9 triggers a warm yellow warning mark */
+              <div 
+                className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 border-2 border-white rounded-full flex items-center justify-center shadow-sm z-10"
+                title={`Low Inventory Warning: Only ${stockLevel} items remaining.`}
+              >
+                <AlertTriangle className="w-2.5 h-2.5 text-white stroke-[3]" />
+              </div>
+            ) : null}
+          </div>
+
           <div>
-            <p className="text-sm font-medium text-stone-900">{product.name}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-stone-900">{product.name}</p>
+              {/* Optional inline badge tracking the true remainder inside details row */}
+              {stockLevel < 10 && (
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${stockLevel < 5 ? 'text-red-600 bg-red-50' : 'text-amber-600 bg-amber-50'}`}>
+                  Qty: {stockLevel}
+                </span>
+              )}
+            </div>
             <p className="text-xs text-stone-400 mt-0.5">/{product.slug || product.id.substring(0, 8)}...</p>
           </div>
         </div>
@@ -185,7 +221,7 @@ export default function ProductRow({
           <input
             type="checkbox"
             checked={newArrival}
-            disabled={isToggling}
+            disabled={isPending}
             onChange={() => handleToggleStatus('is_new_arrival', newArrival, setNewArrival)}
             className="w-4 h-4 rounded-md border-stone-300 text-neutral-900 focus:ring-[#c5a880] focus:ring-opacity-20 cursor-pointer disabled:opacity-40 accent-stone-900"
           />
@@ -198,7 +234,7 @@ export default function ProductRow({
           <input
             type="checkbox"
             checked={bestSeller}
-            disabled={isToggling}
+            disabled={isPending}
             onChange={() => handleToggleStatus('is_best_seller', bestSeller, setBestSeller)}
             className="w-4 h-4 rounded-md border-stone-300 text-neutral-900 focus:ring-[#c5a880] focus:ring-opacity-20 cursor-pointer disabled:opacity-40 accent-stone-900"
           />
@@ -234,7 +270,7 @@ export default function ProductRow({
       {/* Actions Modification Triggers */}
       <td className="px-6 py-3.5">
         <div className="flex items-center justify-end gap-1">
-          {isToggling && <Loader2 className="w-4 h-4 animate-spin text-stone-400 mr-2" />}
+          {isPending && <Loader2 className="w-4 h-4 animate-spin text-stone-400 mr-2" />}
           <Link
             href={`/admin/products/${product.id}/edit`}
             className="p-2 rounded-lg text-stone-400 hover:text-neutral-800 hover:bg-stone-100 transition-colors"
@@ -264,4 +300,3 @@ export default function ProductRow({
     </tr>
   )
 }
-

@@ -425,6 +425,33 @@ export async function createOrder(addressData: any, paymentMethod: string, cartI
       console.error("Critical Supabase Orders insert crash:", orderInsertError.message)
       return { success: false, error: `Database Write Error: ${orderInsertError.message}` }
     }
+    // Reduce product stock
+for (const item of cartItemsFromFrontend) {
+  const { data: product, error } = await supabaseAdmin
+    .from('products')
+    .select('stock')
+    .eq('id', item.id)
+    .single()
+
+  if (error || !product) {
+    console.warn(`Product ${item.id} not found.`)
+    continue
+  }
+
+  const currentStock = Number(product.stock) || 0
+  const orderedQty = Number(item.quantity) || 1
+
+  const newStock = Math.max(0, currentStock - orderedQty)
+
+  const { error: updateError } = await supabaseAdmin
+    .from('products')
+    .update({ stock: newStock })
+    .eq('id', item.id)
+
+  if (updateError) {
+    console.error(`Failed to update stock for ${item.id}:`, updateError.message)
+  }
+}
 
   } catch (dbErr: any) {
     console.error("Orders transaction catch error block:", dbErr)

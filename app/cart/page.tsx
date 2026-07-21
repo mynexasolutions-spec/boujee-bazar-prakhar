@@ -182,7 +182,7 @@ export default function CartPage() {
                 <div className="space-y-3">
                   <Link
                     href="/checkout"
-                    className="w-full block text-center py-4 bg-neutral-900 text-white font-semibold rounded-full shadow-md hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+                    className="w-full block text-center py-4 !bg-[#DCB980] !text-black font-semibold rounded-full shadow-md hover:bg-[#c9a46a] transition-all flex items-center justify-center gap-2"
                   >
                     Proceed to Checkout <i className="fa-solid fa-arrow-right text-xs"></i>
                   </Link>

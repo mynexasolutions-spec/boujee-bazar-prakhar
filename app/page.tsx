@@ -140,6 +140,7 @@ import FAQ from '@/components/FAQ'
 import Footer from '@/components/Footer'
 import FloatingWhatsApp from '@/components/FloatingWhatsApp'
 import { createClient } from '@/lib/supabase/server'
+import Categories from '@/components/Categories'
 
 export const metadata = {
   title: 'The Boujee Bazaar | Minimal & Luxury Jewelry',
@@ -159,7 +160,14 @@ export default async function Home() {
   
 
   const settings = globalSettingsObj?.value || {}
+  const { data: bannerRowObj } = await supabase
+    .from('store_settings')
+    .select('value')
+    .eq('key', 'hero_bg_banner')
+    .single()
 
+  // Safely extract the inner JSON value key string path (e.g. data.value.url)
+  const dynamicBannerUrl = (bannerRowObj?.value as any)?.url || null
    const { data: faqsData, error: faqsError } = await supabase
     .from('global_faqs')
     .select('id, question, answer, display_order')
@@ -224,11 +232,11 @@ export default async function Home() {
       
       <main className="pt-24 md:pt-28">
         <Hero slides={rawSlides} />
-        <Collections categories={rawCategories} />
+        <Categories categories={rawCategories} />
         <NewArrivals products={newArrivals} />
         <Products products={bestSellers} />
         
-        <Edition />
+        <Edition bannerUrl={settings?.hero_bg_banner?.url} />
         <Features />
         <Aboutp />
         <Reviews />

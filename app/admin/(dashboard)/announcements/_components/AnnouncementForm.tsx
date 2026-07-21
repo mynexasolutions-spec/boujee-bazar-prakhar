@@ -111,6 +111,8 @@
 //   )
 // }
 'use client'
+import { X } from 'lucide-react'
+import { CldUploadWidget } from 'next-cloudinary'
 
 import { useState, useTransition } from 'react'
 import { saveCompleteStoreConfig } from '@/actions/admin/announcements'
@@ -256,20 +258,71 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
       </div>
 
       {/* SECTION 3: Hero Background Banner URL Configuration */}
-      <div className="bg-white rounded-2xl border border-stone-200/60 p-6 md:p-8 space-y-4 shadow-xs">
-        <h3 className="text-sm font-bold uppercase text-stone-400 tracking-wider flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-          <ImageIcon className="w-4 h-4 text-[#c5a880]" /> Hero Background Banner (`hero_bg_banner`)
-        </h3>
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-1.5">Cloudinary Image URL</label>
-          <input type="text" value={heroBgBanner.url} onChange={(e) => setHeroBgBanner({ url: e.target.value })} placeholder="https://cloudinary.com..." className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all placeholder:text-stone-300" />
+      {/* SECTION 3: Hero Background Banner URL Configuration */}
+<div className="bg-white rounded-2xl border border-stone-200/60 p-6 md:p-8 space-y-4 shadow-xs" style={{ fontFamily: 'Poppins, sans-serif' }}>
+  <h3 className="text-sm font-bold uppercase text-stone-400 tracking-wider flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+    <ImageIcon className="w-4 h-4 text-[#c5a880]" /> Hero Background Banner (`hero_bg_banner`)
+  </h3>
+  
+  <div>
+    <label className="block text-xs font-semibold text-stone-600 mb-1.5">
+      Collection Hero Image Cover <span className="text-red-500">*</span>
+    </label>
+    
+    {heroBgBanner.url ? (
+      /* ✅ ACTIVE PREVIEW BOX: Shows your dynamic uploaded PC asset with a reset handle button */
+      <div className="space-y-3">
+        <div className="relative w-full h-44 rounded-xl overflow-hidden bg-stone-50 border border-stone-200/60 shadow-inner group">
+          <img 
+            src={heroBgBanner.url} 
+            alt="Hero Banner Preview" 
+            className="w-full h-full object-cover" 
+          />
+          <button
+            type="button"
+            onClick={() => setHeroBgBanner({ url: '' })} // 💡 Clears out the image value instantly
+            className="absolute top-3 right-3 p-1.5 bg-white/90 hover:bg-white text-stone-700 hover:text-red-600 rounded-lg shadow-md backdrop-blur-xs transition-all border border-stone-200/60 flex items-center justify-center"
+            title="Remove Banner Image"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-        {heroBgBanner.url && (
-          <div className="relative w-full h-32 rounded-xl overflow-hidden bg-stone-50 border border-stone-200/60">
-            <img src={heroBgBanner.url} alt="Banner Preview" className="w-full h-full object-cover" />
-          </div>
-        )}
+        <p className="text-[11px] text-stone-400 font-medium truncate bg-stone-50 px-3 py-1.5 rounded-lg border border-stone-100">
+          🔗 Live Path: {heroBgBanner.url}
+        </p>
       </div>
+    ) : (
+      /* ✅ CLOUDINARY FILE SELECTOR: Hooks straight into your working api/cloudinary/sign route path */
+      <CldUploadWidget 
+        signatureEndpoint="/api/cloudinary/sign"
+        options={{
+          maxFiles: 1,
+          resourceType: "image",
+          clientAllowedFormats: ["jpg", "jpeg", "png", "webp"]
+        }}
+        onSuccess={(result: any) => {
+          // Updates your parent state hook variable value context parameter instantly on upload completion
+          setHeroBgBanner({ url: result.info.secure_url })
+        }}
+      >
+        {({ open }) => (
+          <button
+            type="button"
+            onClick={() => open()}
+            className="w-full h-36 flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-stone-300 bg-stone-50 text-stone-500 hover:bg-[#FBF7F0] hover:border-[#c5a880] hover:text-[#c5a880] transition-all"
+          >
+            <div className="w-10 h-10 rounded-full bg-white border border-stone-200/60 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+              <ImageIcon className="w-5 h-5 text-stone-400" />
+            </div>
+            <span className="text-sm font-semibold mt-1">Click to upload banner from PC</span>
+            <span className="text-xs text-stone-400 font-medium">Recommended size: 1200x500px or larger</span>
+          </button>
+        )}
+      </CldUploadWidget>
+    )}
+  </div>
+</div>
+
 
       {/* SECTION 4: Interactive 6 Home Curation Cards Config Grid */}
       <div className="bg-white rounded-2xl border border-stone-200/60 p-6 md:p-8 space-y-6 shadow-xs">

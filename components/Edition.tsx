@@ -2,16 +2,22 @@
 
 import { useRouter } from 'next/navigation'
 
-export default function LimitedEdition() {
+interface LimitedEditionProps {
+  // ✅ Accepts your standalone database banner string prop
+  bannerUrl?: string 
+}
+
+export default function LimitedEdition({ bannerUrl }: LimitedEditionProps) {
   const router = useRouter()
 
   const handleNavigation = () => {
-    // Smoothly routes shoppers straight to your curated celestial collection page
     router.push('/shop?collection=celestial')
   }
 
+  // Fallback to local asset if database value isn't loaded or configured yet
+  const resolvedImage = bannerUrl || "/assets/img/demos_insta/demo_9.jpeg"
+
   return (
-    // 🌟 EXACT STRUCTURE MATCH: Restored your clean class tokens natively
     <section className="limited-edition hero-slider select-none">
       <div className="slides-container">
         <div className="slide active">
@@ -40,9 +46,10 @@ export default function LimitedEdition() {
           <div className="hero-image">
             <div className="hero-overlay"></div>
             <img
-              src="/assets/img/demos_insta/demo_9.jpeg" // Points directly to your local file system image asset path
+              src={resolvedImage} // ✅ Bound directly to your live database URL
               alt="Limited Edition Jewelry Celestial Drop Collection"
-              loading="eager"
+              loading="lazy"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>
 

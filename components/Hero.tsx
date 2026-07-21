@@ -46,21 +46,51 @@ export default function Hero({ slides: dbSlides }: { slides?: any[] }) {
     },
   ]
 
-  // Map database slides to target shape
+  // ✅ FIXED: Added missing array structures and map parameters loop handlers cleanly
   const slides: HeroSlide[] = dbSlides && dbSlides.length > 0
-    ? dbSlides.map((slide: any) => ({
-        subtitle: slide.subtitle || 'MINIMAL. TIMELESS. YOU.',
-        title: slide.title ? slide.title.split(' ').slice(0, -1).join(' ') + ' ' : 'Jewelry that ',
-        highlight: slide.title ? slide.title.split(' ').slice(-1)[0] : 'completes you.',
-        description: slide.description || 'Anti-tarnish • Waterproof • Hypoallergenic.',
-        cta: slide.button_text || 'SHOP NOW ✨',
-        image: slide.url || slide.image_url || 'assets/img/slider_1.jpeg',
-        button_link: slide.button_link || '/shop'
-      }))
+    ? dbSlides.map((slide: any, idx: number) => {
+        const textVariations = [
+          {
+            subtitle: 'MINIMAL. TIMELESS. YOU.',
+            title: 'Jewelry that ',
+            highlight: 'completes you.',
+            description: 'Anti-tarnish • Waterproof • Hypoallergenic. Made to shine, every single day.'
+          },
+          {
+            subtitle: 'LUXURY. BEAUTY. FOREVER.',
+            title: 'Shine with ',
+            highlight: 'elegance.',
+            description: '18k Gold Plated • Premium Quality. Designed for the modern woman.'
+          },
+          {
+            subtitle: 'BOLD. CHIC. CONFIDENT.',
+            title: 'Perfect for ',
+            highlight: 'every occasion.',
+            description: 'Handcrafted • Ethical • Sustainable. Express your unique style.'
+          }
+        ]
+
+        const currentVariation = textVariations[idx % textVariations.length]
+
+        return {
+          subtitle: slide.subtitle || currentVariation.subtitle,
+          title: slide.title 
+            ? slide.title.split(' ').slice(0, -1).join(' ') + ' ' 
+            : currentVariation.title,
+          highlight: slide.title 
+            ? slide.title.split(' ').slice(-1)[0] 
+            : currentVariation.highlight,
+          description: slide.description || currentVariation.description,
+          cta: slide.button_text || 'SHOP NOW ✨',
+          image: slide.url || slide.image_url || 'assets/img/slider_1.jpeg',
+          button_link: slide.button_link || '/shop'
+        }
+      })
     : fallbackSlides
 
   // Auto slide every 5 seconds
   useEffect(() => {
+    if (slides.length <= 1) return
     const sliderInterval = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length)
     }, 5000)
@@ -123,16 +153,18 @@ export default function Hero({ slides: dbSlides }: { slides?: any[] }) {
       </div>
 
       {/* Slider Controls / Dots */}
-      <div className="slider-controls">
-        {slides.map((_, idx) => (
-          <button
-            key={idx}
-            className={`slider-dot ${idx === currentSlide ? 'active' : ''}`}
-            onClick={() => goToSlide(idx)}
-            aria-label={`Go to slide ${idx + 1}`}
-          ></button>
-        ))}
-      </div>
+      {slides.length > 1 && (
+        <div className="slider-controls">
+          {slides.map((_, idx) => (
+            <button
+              key={idx}
+              className={`slider-dot ${idx === currentSlide ? 'active' : ''}`}
+              onClick={() => goToSlide(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
+            ></button>
+          ))}
+        </div>
+      )}
     </section>
   )
 }
