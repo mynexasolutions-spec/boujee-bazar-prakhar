@@ -745,7 +745,7 @@ import React, { useState, useEffect, useTransition } from 'react'
 import { useCart } from '@/context/CartContext'
 import { useToast } from '@/context/ToastContext'
 import { validateCoupon } from '@/actions/admin/coupons'
-import { processCheckout, verifyRazorpayPayment } from '@/actions/checkout'
+import { processCheckout, verifyRazorpayPayment, cancelPendingOrder } from '@/actions/checkout'
 import { SITE } from '@/lib/data'
 import { Truck, Tag, CreditCard, ShoppingBag, CheckCircle2, Lock, Plus, Minus, X, Loader2 } from 'lucide-react'
 import Image from 'next/image'
@@ -918,13 +918,17 @@ export default function CheckoutForm({ shipping, isLoggedIn }: { shipping: Shipp
           name: SITE.name,
           description: "Order Payment",
           order_id: orderData.razorpayOrderId,
+          modal: {
+            ondismiss: function () {
+              cancelPendingOrder(orderData.orderId)
+            }
+          },
           handler: async function (response: any) {
             const verifyRes = await verifyRazorpayPayment(
               response.razorpay_payment_id,
               response.razorpay_order_id,
               response.razorpay_signature,
-              orderData.orderId,
-              orderData.orderRecordData
+              orderData.orderId
             )
             if (verifyRes.success) {
               setPlacedOrder({
@@ -951,6 +955,7 @@ export default function CheckoutForm({ shipping, isLoggedIn }: { shipping: Shipp
 
         const rzp1 = new (window as any).Razorpay(options);
         rzp1.on('payment.failed', function (response: any){
+          cancelPendingOrder(orderData.orderId)
           showToast("Payment failed! Reason: " + (response.error?.description || 'Transaction failed'), "error");
         });
         rzp1.open();

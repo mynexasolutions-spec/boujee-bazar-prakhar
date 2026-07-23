@@ -70,14 +70,11 @@ export async function POST(req: Request) {
         let query = supabaseAdmin.from('orders').update({
           payment_status: 'paid',
           status: 'confirmed',
-          razorpay_payment_id: razorpayPaymentId,
-          razorpay_order_id: razorpayOrderId,
+          notes: `Paid via Razorpay Webhook (Txn: ${razorpayPaymentId})`,
         })
 
         if (internalOrderId) {
           query = query.eq('id', internalOrderId)
-        } else if (razorpayOrderId) {
-          query = query.eq('razorpay_order_id', razorpayOrderId)
         }
 
         const { error: updateErr } = await query
@@ -95,28 +92,20 @@ export async function POST(req: Request) {
         if (!payment) break
 
         const razorpayPaymentId = payment.id
-        const razorpayOrderId = payment.order_id
         const internalOrderId = payment.notes?.internal_order_id || payment.notes?.order_id || payment.receipt
         const errorDescription = payment.error_description || 'Payment transaction failed'
 
         console.log(`[Razorpay Webhook]: Processing payment.failed for payment ${razorpayPaymentId}, reason: ${errorDescription}`)
 
-        let query = supabaseAdmin.from('orders').update({
-          payment_status: 'failed',
-          razorpay_payment_id: razorpayPaymentId,
-          notes: `Payment Failed: ${errorDescription}`,
-        })
-
         if (internalOrderId) {
-          query = query.eq('id', internalOrderId)
-        } else if (razorpayOrderId) {
-          query = query.eq('razorpay_order_id', razorpayOrderId)
-        }
+          const { error: updateErr } = await supabaseAdmin.from('orders').update({
+            payment_status: 'failed',
+            notes: `Payment Failed: ${errorDescription}`,
+          }).eq('id', internalOrderId)
 
-        const { error: updateErr } = await query
-
-        if (updateErr) {
-          console.error('[Razorpay Webhook Error]: DB update failed for payment.failed:', updateErr.message)
+          if (updateErr) {
+            console.error('[Razorpay Webhook Error]: DB update failed for payment.failed:', updateErr.message)
+          }
         }
         break
       }
@@ -130,21 +119,15 @@ export async function POST(req: Request) {
 
         console.log(`[Razorpay Webhook]: Processing order.paid for razorpay order ${razorpayOrderId}, internal order ${internalOrderId}`)
 
-        let query = supabaseAdmin.from('orders').update({
-          payment_status: 'paid',
-          status: 'confirmed',
-        })
-
         if (internalOrderId) {
-          query = query.eq('id', internalOrderId)
-        } else if (razorpayOrderId) {
-          query = query.eq('razorpay_order_id', razorpayOrderId)
-        }
+          const { error: updateErr } = await supabaseAdmin.from('orders').update({
+            payment_status: 'paid',
+            status: 'confirmed',
+          }).eq('id', internalOrderId)
 
-        const { error: updateErr } = await query
-
-        if (updateErr) {
-          console.error('[Razorpay Webhook Error]: DB update failed for order.paid:', updateErr.message)
+          if (updateErr) {
+            console.error('[Razorpay Webhook Error]: DB update failed for order.paid:', updateErr.message)
+          }
         }
         break
       }
