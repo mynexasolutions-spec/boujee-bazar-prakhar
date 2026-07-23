@@ -283,7 +283,7 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
     <>
       {/* Mobile Filter Drawer Overlay Canvas */}
       {isMobileFilterOpen && (
-        <div className={`fixed inset-0 z-[100] flex lg:hidden transition-opacity duration-300 ${
+        <div className={`fixed inset-0 z-[1000] flex lg:hidden transition-opacity duration-300 ${
         isMobileFilterOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       }`}>
         {/* A. Animated Dark Blur Backdrop Layer - Clicking this now ALSO closes the filters safely */}
@@ -304,7 +304,7 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
             </h2>
             
             {/* Optimized High-Touch Close Handle Button */}
-            <button 
+            {/* <button 
               type="button"
               onClick={() => setIsMobileFilterOpen(false)}
               className="p-2.5 bg-neutral-50 rounded-xl text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 border border-neutral-200/80 transition-all flex items-center justify-center"
@@ -314,7 +314,7 @@ export default function ShopGrid({ initialProducts, categories, selectedCategory
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </button> */}
           </div>
 
           {/* Render your existing database filter categories and price inputs group lists */}
