@@ -615,7 +615,7 @@ export default function Header({ announcement: propAnnouncement }: HeaderProps =
 
   return (
     <>
-      <header className={`fixed top-0 inset-x-0 z-[99999] transition-all duration-300 ${
+      <header className={`fixed top-0 inset-x-0 z-[999] transition-all duration-300 ${
         open ? "bg-white" : scrolled ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-neutral-100" : isHome ? "bg-transparent" : "bg-white border-b border-neutral-100"
       }`} style={{ fontFamily: 'Poppins, sans-serif' }}>
         
