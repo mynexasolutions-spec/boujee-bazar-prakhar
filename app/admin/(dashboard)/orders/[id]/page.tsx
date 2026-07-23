@@ -535,6 +535,10 @@ try {
               </div>
             </div>
             <div className="mt-6 pt-6 border-t border-stone-200 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Order Number</span>
+                <span className="font-mono font-bold text-stone-900 bg-stone-100 px-2.5 py-1 rounded-lg text-xs border border-stone-200">{order.order_number}</span>
+              </div>
               <div>
                 <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-1">Payment Method</p>
                 <p className="text-sm font-medium text-stone-900">{order.payment_method || 'Cash on Delivery'}</p>
