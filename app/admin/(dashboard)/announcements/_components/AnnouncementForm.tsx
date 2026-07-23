@@ -111,10 +111,10 @@
 //   )
 // }
 'use client'
-import { X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { CldUploadWidget } from 'next-cloudinary'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { saveCompleteStoreConfig } from '@/actions/admin/announcements'
 import { Check, Loader2, Megaphone, Store, Truck, ShieldCheck, Mail, Phone, MapPin, Image as ImageIcon, Tag, Layers } from 'lucide-react'
 
@@ -130,6 +130,20 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
     announcement_active: initialData?.global_settings?.announcement_active ?? false,
     enable_cod: initialData?.global_settings?.enable_cod ?? true,
   })
+   // State to hold multiple announcements locally for the UI fields
+  const [announcementList, setAnnouncementList] = useState<string[]>([''])
+   useEffect(() => {
+    if (initialData?.global_settings?.announcement_message) {
+      const parsed = initialData.global_settings.announcement_message
+        .split('•')
+        .map((item: string) => item.trim())
+        .filter((item: string) => item !== '')
+      
+      if (parsed.length > 0) {
+        setAnnouncementList(parsed)
+      }
+    }
+  }, [initialData])
 
   const [heroBgBanner, setHeroBgBanner] = useState({
     url: initialData?.hero_bg_banner?.url || ''
@@ -154,7 +168,26 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
   const handleUpdateGlobal = (key: string, value: any) => {
     setGlobalSettings(prev => ({ ...prev, [key]: value }))
   }
+    const handleAnnouncementItemChange = (index: number, value: string) => {
+    const updated = [...announcementList]
+    updated[index] = value
+    setAnnouncementList(updated)
+  }
 
+  // Add a new empty input field for another announcement
+  const addAnnouncementField = () => {
+    setAnnouncementList([...announcementList, ''])
+  }
+
+  // Remove a specific announcement field from the UI
+  const removeAnnouncementField = (index: number) => {
+    if (announcementList.length === 1) {
+      setAnnouncementList(['']) // Keep at least one empty box
+    } else {
+      setAnnouncementList(announcementList.filter((_, i) => i !== index))
+    }
+  }
+  
   const handleUpdateCard = (index: number, field: 'image' | 'label', value: string) => {
     const updated = [...heroCards]
     if (!updated[index]) updated[index] = { image: '', label: '' }
@@ -163,8 +196,12 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
   }
 
   const handleSaveAllConfig = () => {
-    if (!globalSettings.announcement_message.trim() && globalSettings.announcement_active) {
-      setError('Announcement text cannot be blank while header banner is active.')
+    // Clean items and join them back into a single string using " • " separator
+    const cleanedItems = announcementList.map(item => item.trim()).filter(item => item !== '')
+    const combinedMessage = cleanedItems.join(' • ')
+
+    if (!combinedMessage && globalSettings.announcement_active) {
+      setError('At least one announcement item is required while header banner is active.')
       return
     }
 
@@ -172,8 +209,14 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
     setSuccess(false)
     
     startTransition(async () => {
+      // Package the combined string into global_settings payload before saving
+      const updatedGlobalSettings = {
+        ...globalSettings,
+        announcement_message: combinedMessage
+      }
+
       const result = await saveCompleteStoreConfig({
-        global_settings: globalSettings,
+        global_settings: updatedGlobalSettings,
         hero_bg_banner: heroBgBanner,
         hero_cards: heroCards
       })
@@ -182,11 +225,12 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
         setError(result.error)
       } else {
         setSuccess(true)
+        // Sync local settings object state with the new string representation
+        setGlobalSettings(updatedGlobalSettings)
         setTimeout(() => setSuccess(false), 3000)
       }
     })
   }
-
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-12" style={{ fontFamily: 'Poppins, sans-serif' }}>
       
@@ -235,7 +279,6 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
         <h3 className="text-sm font-bold uppercase text-stone-400 tracking-wider flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
           <Truck className="w-4 h-4 text-[#c5a880]" /> Announcement Controls
         </h3>
-      
 
         <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-200/60">
           <div>
@@ -248,12 +291,42 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
           </label>
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-1.5">Announcement Banner Message</label>
-          <div className="relative">
-            <Megaphone className="absolute left-3.5 top-3.5 w-4 h-4 text-stone-400" />
-            <input type="text" value={globalSettings.announcement_message} onChange={(e) => handleUpdateGlobal('announcement_message', e.target.value)} placeholder="e.g., Free Shipping on all orders over ₹500!" disabled={isPending} className="w-full pl-11 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all" /><input type="text" maxLength={255} value={globalSettings.announcement_message} onChange={(e) => handleUpdateGlobal('announcement_message', e.target.value)} placeholder="e.g., Free Shipping over ₹999!" disabled={isPending} className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all placeholder:text-stone-300" />
-          </div>
+        {/* Dynamic Multi-Announcement Input List */}
+        <div className="space-y-3">
+          <label className="block text-xs font-semibold text-stone-600">Announcement Messages</label>
+          
+          {announcementList.map((announcement, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Megaphone className="absolute left-3.5 top-3.5 w-4 h-4 text-stone-400" />
+                <input 
+                  type="text" 
+                  value={announcement} 
+                  onChange={(e) => handleAnnouncementItemChange(index, e.target.value)} 
+                  placeholder="e.g., ✨ Anti-Tarnish Jewelry or 🚚 Free Shipping Above ₹1499" 
+                  disabled={isPending} 
+                  className="w-full pl-11 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all" 
+                />
+              </div>
+              <button 
+                type="button"
+                onClick={() => removeAnnouncementField(index)}
+                disabled={isPending}
+                className="p-2.5 text-stone-400 hover:text-red-500 bg-stone-50 border border-stone-200 rounded-xl hover:bg-red-50/50 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addAnnouncementField}
+            disabled={isPending}
+            className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-stone-300 hover:border-[#c5a880] rounded-xl text-xs font-semibold text-stone-600 hover:text-[#c5a880] transition-all bg-white"
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Another Text Item
+          </button>
         </div>
       </div>
 
@@ -324,7 +397,7 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
 </div>
 
 
-      {/* SECTION 4: Interactive 6 Home Curation Cards Config Grid */}
+      {/* SECTION 4: Interactive 6 Home Curation Cards Config Grid
       <div className="bg-white rounded-2xl border border-stone-200/60 p-6 md:p-8 space-y-6 shadow-xs">
         <h3 className="text-sm font-bold uppercase text-stone-400 tracking-wider flex items-center gap-2" style={{ fontFamily: 'Playfair Display, serif' }}>
           <Layers className="w-4 h-4 text-[#c5a880]" /> Promotional Grid Categories (`hero_cards`)
@@ -356,7 +429,7 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
             )
           })}
         </div>
-      </div>
+      </div> */}
 
       {/* Global Bottom Sticky Trigger Bar */}
       <div className="bg-stone-50 border border-stone-200 p-4 rounded-2xl flex items-center gap-4 justify-between sticky bottom-4 shadow-md backdrop-blur-md bg-white/90">
@@ -379,4 +452,4 @@ export function AnnouncementForm({ initialData }: { initialData: any }) {
 
     </div>
   )
-}
+  }

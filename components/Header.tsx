@@ -620,13 +620,42 @@ export default function Header({ announcement: propAnnouncement }: HeaderProps =
       }`} style={{ fontFamily: 'Poppins, sans-serif' }}>
         
         {/* 🌟 UI MATCH: Top Announcement Bar styled with minimal black backgrounds from your HTML */}
-        {isAnnouncementActive && (
-  <div className="w-full bg-neutral-900 text-white text-[10px] sm:text-xs py-2.5 px-4 text-center font-semibold tracking-widest uppercase flex items-center justify-center gap-2">
-    <span>✨</span>
-    <span>{announcementMessage}</span>
-    <span>✨</span>
-  </div>
-)}
+
+    {/* 1. Placement outside header allows it to scroll up naturally with the document view */}
+    {isAnnouncementActive && (
+      <div
+    className={`overflow-hidden transition-all duration-300 ${
+      scrolled ? "max-h-0 opacity-0 -translate-y-full" : "max-h-12 opacity-100 translate-y-0"
+    }`}
+  >
+      <div className="w-full bg-neutral-900 text-white text-[10px] sm:text-xs py-2.5 overflow-hidden font-semibold tracking-widest uppercase relative select-none">
+        <div className="flex whitespace-nowrap min-w-full">
+          
+          {/* Track 1: Left-to-Right Animation */}
+          <div className="flex shrink-0 items-center justify-around min-w-full animate-marquee-rtl gap-16 px-8">
+            {announcementMessage.split('•').map((item, idx) => (
+              <span key={`t1-${idx}`} className="flex items-center gap-2">
+                 {item.trim()}
+              </span>
+            ))}
+          </div>
+
+          {/* Track 2: Mirrored Clone Layer */}
+          <div className="flex shrink-0 items-center justify-around min-w-full animate-marquee-rtl gap-16 px-8" aria-hidden="true">
+            {announcementMessage.split('•').map((item, idx) => (
+              <span key={`t2-${idx}`} className="flex items-center gap-2">
+                {item.trim()}
+              </span>
+            ))}
+          </div>
+
+        </div>
+      </div>
+      </div>
+    )}
+
+   
+
         {/* Main Navbar Core */}
         <div className="w-full max-w-[1500px] mx-auto px-5 md:px-10 flex items-center justify-between h-[72px] md:h-[84px] relative">
           {/* Mobile hamburger — Left side on mobile viewports */}

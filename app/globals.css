@@ -72,6 +72,7 @@
       }
 
       /* Announcement Bar */
+
       .announcement-bar {
         background-color: var(--primary);
         color: white;
@@ -85,6 +86,21 @@
         align-items: center;
         gap: 8px;
       }
+     @layer utilities {
+  @keyframes marquee-rtl {
+    0% {
+      transform: translateX(0%);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .animate-marquee-rtl {
+    animation: marquee-rtl 25s linear infinite;
+  }
+}
 
       /* Navbar */
       .navbar {
@@ -301,6 +317,10 @@
         justify-content: center;
         overflow: hidden;
         transition: box-shadow 0.4s ease, transform 0.4s ease;
+
+         border: 1.5px solid #F6EFE9; /* Elegant gold/tan ring color */
+  padding: 10px;                /* Creates the spacing between ring and image */
+  background-color: #F6EFE9; 
       }
       .collection-item:hover .collection-img {
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
