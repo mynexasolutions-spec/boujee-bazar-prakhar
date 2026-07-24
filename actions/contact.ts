@@ -1,39 +1,44 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import crypto from 'crypto'
 
-export async function submitInquiry(formData: FormData) {
-  const supabase = await createClient()
+export async function submitCustomerInquiry(formData: {
+  name: string
+  email: string
+  phone: string
+  subject: string
+  message: string
+}) {
+  const { name, email, phone, subject, message } = formData
 
-  const first_name = formData.get('first-name') as string
-  const last_name = formData.get('last-name') as string
-  const email = formData.get('email') as string
-  const message = formData.get('message') as string
-
-  if (!first_name || !last_name || !email || !message) {
-    return { success: false, error: 'All fields are required.' }
+  if (!name.trim() || !email.trim() || !message.trim()) {
+    return { error: 'Please populate all mandatory fields.' }
   }
 
-  // Validate email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) {
-    return { success: false, error: 'Please provide a valid email address.' }
+  try {
+    const supabaseAdmin = createAdminClient()
+    const uniqueId = `INQ-${crypto.randomUUID().substring(0, 8).toUpperCase()}`
+
+    const { error } = await supabaseAdmin
+      .from('inquiries')
+      .insert([{
+        id: uniqueId,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim() || null,
+        subject: subject.trim() || 'General Store Inquiry',
+        message: message.trim()
+      }])
+
+    if (error) {
+      console.error('Supabase Inquiries Insert Error:', error.message)
+      return { error: `Database entry failed: ${error.message}` }
+    }
+
+    return { success: true }
+  } catch (err: any) {
+    console.error('Inquiry catch block execution issue:', err)
+    return { error: 'An unexpected internal server error occurred.' }
   }
-
-  const { error } = await supabase
-    .from('contact_inquiries')
-    .insert([{
-      first_name,
-      last_name,
-      email,
-      message,
-      status: 'unread'
-    }])
-
-  if (error) {
-    console.error('Failed to submit inquiry:', error)
-    return { success: false, error: 'Something went wrong. Please try again later.' }
-  }
-
-  return { success: true }
 }

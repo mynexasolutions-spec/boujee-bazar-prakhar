@@ -266,36 +266,213 @@
 // }
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
+import { submitCustomerInquiry } from "@/actions/contact";
+import { Mail, Phone, MapPin, Send, Loader2, Sparkles } from "lucide-react";
 
 export default function Contact() {
-  const [email, setEmail] = useState("");
+  // Newsletter State
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+
+  // Inquiry Form States
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: ""
+  });
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Thank you for subscribing with: ${email}! ✨`);
-    setEmail("");
+    alert(`Thank you for subscribing with: ${newsletterEmail}! ✨`);
+    setNewsletterEmail("");
+  };
+
+  const handleInquirySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+
+    startTransition(async () => {
+      const result = await submitCustomerInquiry(form);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setSuccess(true);
+        setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+        setTimeout(() => setSuccess(false), 5000);
+      }
+    });
   };
 
   return (
-    <section className="newsletter-banner" id="contact">
-      <div className="newsletter-content">
-        <h2>JOIN THE <span className="highlight-text">BOUJEE</span> FAMILY ✨</h2>
-        <p>
-          Subscribe to receive 10% off your first order, exclusive access to
-          new drops, and styling tips.
-        </p>
-        <form className="newsletter-form-large" onSubmit={handleSubscribe}>
-          <input 
-            type="email" 
-            placeholder="Enter your email address" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required 
-          />
-          <button type="submit" className="btn-primary">SUBSCRIBE</button>
-        </form>
-      </div>
-    </section>
+    <div className="space-y-16 pb-20" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      
+      {/* 1. Brand Inquiry & Contact Form Layout Grid */}
+      <section className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-10 pt-16">
+        
+        {/* Left Side: Editorial Brand Details Info Column */}
+        <div className="lg:col-span-5 space-y-6 flex flex-col justify-center">
+          <div>
+            <span className="text-[11px] font-extrabold tracking-widest text-[#c5a880] uppercase block mb-2">Get In Touch</span>
+            <h3 className="text-3xl font-bold text-stone-900 leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+              We'd Love To Hear From You
+            </h3>
+            <p className="text-sm text-stone-500 mt-2.5 leading-relaxed">
+              Have questions about our collections, customized orders, or looking for gifting suggestions? Message our support desk directly.
+            </p>
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-stone-100">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-stone-50 border border-stone-200/60 rounded-xl text-[#c5a880] shrink-0">
+                <Mail className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-stone-400 uppercase tracking-wider">Email Support</p>
+                <p className="text-sm font-semibold text-stone-900 mt-0.5">theboujeebazaar11@gmail.com</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-stone-50 border border-stone-200/60 rounded-xl text-[#c5a880] shrink-0">
+                <Phone className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-stone-400 uppercase tracking-wider">Customer Hotline</p>
+                <p className="text-sm font-semibold text-stone-900 mt-0.5">+91 93307 52159</p>
+              </div>
+            </div>
+
+           
+          </div>
+        </div>
+
+        {/* Right Side: Interactive Luxury Form Card Container */}
+        <div className="lg:col-span-7 bg-white rounded-3xl border border-stone-200/70 p-6 md:p-8 shadow-xs">
+          <form onSubmit={handleInquirySubmit} className="space-y-5">
+            
+            {error && (
+              <div className="p-4 bg-red-50 text-red-700 text-xs font-semibold rounded-xl border border-red-100">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="p-4 bg-green-50 text-green-700 text-xs font-semibold rounded-xl border border-green-100 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-green-500 animate-pulse" /> Inquiry submitted successfully! Our concierge team will reach out shortly.
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1.5">Your Name *</label>
+                <input
+                  type="text"
+                  required
+                  maxLength={50}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="e.g. Sarah Jones"
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1.5">Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  maxLength={60}
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="e.g. sarah@example.com"
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1.5">Contact Number</label>
+                <input
+                  type="text"
+                  maxLength={15}
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="e.g. +91 9876543210"
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1.5">Subject</label>
+                <input
+                  type="text"
+                  maxLength={100}
+                  value={form.subject}
+                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                  placeholder="e.g. Custom Ring Sizing Query"
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1.5">Message / Inquiry Details *</label>
+              <textarea
+                required
+                rows={4}
+                maxLength={1000}
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                placeholder="Write your query down in detail here..."
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 bg-white text-stone-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#c5a880]/20 focus:border-[#c5a880] transition-all resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full py-3 px-6 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Verifying Connection...
+                </>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5" /> Submit Inquiry
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* 2. Newsletter Footer Section */}
+      <section className="newsletter-banner" id="contact-newsletter">
+        <div className="newsletter-content">
+          <h2>JOIN THE <span className="highlight-text">BOUJEE</span> FAMILY ✨</h2>
+          <p>
+            Subscribe to receive 10% off your first order, exclusive access to
+            new drops, and styling tips.
+          </p>
+          <form className="newsletter-form-large" onSubmit={handleSubscribe}>
+            <input 
+              type="email" 
+              placeholder="Enter your email address" 
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
+              required 
+            />
+            <button type="submit" className="btn-primary">SUBSCRIBE</button>
+          </form>
+        </div>
+      </section>
+
+    </div>
   );
 }

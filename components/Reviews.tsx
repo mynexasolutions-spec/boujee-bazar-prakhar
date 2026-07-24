@@ -1,46 +1,40 @@
 // components/Reviews.tsx
 'use client'
-
+import { UserCircle2 } from 'lucide-react'
 interface Review {
   text: string
   reviewer: string
-  image: string
+  // image: string
 }
 
 export default function Reviews() {
   // Reviews data from index.html
   const reviews: Review[] = [
-    {
-      text: 'Absolutely in love with the quality! I\'ve been wearing my necklaces every day in the shower and they haven\'t tarnished at all. Highly recommend!',
-      reviewer: 'Sarah J.',
-      image: 'assets/img/demos_insta/demo_13.jpeg',
-    },
-    {
-      text: 'The packaging is so luxurious, it feels like opening a high-end designer piece. The jewelry itself is stunning and so comfortable to wear.',
-      reviewer: 'Priya M.',
-      image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150',
-    },
-    {
-      text: 'Customer service was amazing when I needed to exchange a ring size. The new ring arrived so quickly and fits perfectly. Great brand!',
-      reviewer: 'Emily R.',
-      image: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150',
-    },
-    {
-      text: 'I get so many compliments on my earrings. They look so expensive but were actually so affordable. Very happy!',
-      reviewer: 'Chloe B.',
-      image: 'https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=150',
-    },
-    {
-      text: 'Obsessed with the new drop! The rings stack perfectly and the anti-tarnish feature actually works.',
-      reviewer: 'Nina K.',
-      image: 'https://images.pexels.com/photos/2787341/pexels-photo-2787341.jpeg?auto=compress&cs=tinysrgb&w=150',
-    },
-    {
-      text: 'I bought a set for my best friend\'s birthday and she literally cried. The personalized note was such a sweet touch!',
-      reviewer: 'Ava T.',
-      image: 'https://images.pexels.com/photos/3310695/pexels-photo-3310695.jpeg?auto=compress&cs=tinysrgb&w=150',
-    },
-  ]
+  {
+    text: "I ordered this necklace for my sister's birthday and it looked even better than the pictures. The finish is really premium and delivery was on time.",
+    reviewer: "Ananya Sharma",
+  },
+  {
+    text: "Honestly, I wasn't expecting this quality at this price. I've been wearing these earrings almost every day and they still look brand new.",
+    reviewer: "Riya Gupta",
+  },
+  {
+    text: "The bracelet is very elegant and lightweight. Perfect for office as well as family functions. Really happy with my purchase.",
+    reviewer: "Sneha Verma",
+  },
+  {
+    text: "Beautiful packaging and excellent quality. It feels like a premium brand. Will definitely order again.",
+    reviewer: "Aditi Mehta",
+  },
+  {
+    text: "Bought a ring for my wife on our anniversary and she absolutely loved it. The size was perfect and the design is very classy.",
+    reviewer: "Rahul Agarwal",
+  },
+  {
+    text: "Customer support was very helpful when I had a small query before ordering. The whole experience was smooth and hassle-free.",
+    reviewer: "Karan Malhotra",
+  },
+]
 
   return (
     <section className="w-full py-16 md:py-20 bg-white overflow-hidden relative">
@@ -70,10 +64,12 @@ export default function Reviews() {
                 <p className="review-text">"{review.text}"</p>
 
                 {/* Reviewer Info - from index.html */}
-                <div className="reviewer-info">
-                  <img src={review.image} alt={review.reviewer} />
-                  <span>{review.reviewer}</span>
-                </div>
+              <div className="reviewer-info">
+  <div className="reviewer-avatar">
+    <UserCircle2 size={34} strokeWidth={1.8} />
+  </div>
+  <span>{review.reviewer}</span>
+</div>
               </div>
             ))}
 
@@ -90,10 +86,12 @@ export default function Reviews() {
 
                 <p className="review-text">"{review.text}"</p>
 
-                <div className="reviewer-info">
-                  <img src={review.image} alt={review.reviewer} />
-                  <span>{review.reviewer}</span>
-                </div>
+               <div className="reviewer-info">
+  <div className="reviewer-avatar">
+    <UserCircle2 size={34} strokeWidth={1.8} />
+  </div>
+  <span>{review.reviewer}</span>
+</div>
               </div>
             ))}
           </div>

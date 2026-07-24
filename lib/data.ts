@@ -213,10 +213,10 @@
 export const SITE = {
   name: "The Boujee Bazaar",
   tagline: "Minimal & Luxury Jewelry",
-  email: "contact@theboujeebazaar.com",
-  phone: "+91 99999 99999", // Update with your active operational sales numbers
-  phoneHref: "+919999999999",
-  whatsapp: "919999999999",
+  email: "theboujeebazaar@gmail.com",
+  phone: "+91 93307 52159", // Update with your active operational sales numbers
+  phoneHref: "+919330752159",
+  whatsapp: "919330752159",
   whatsappMessage: "Hi The Boujee Bazaar! I'd like to check out your minimal & luxury jewelry collections.",
   city: "Delhi NCR, India",
 };
@@ -434,6 +434,7 @@ export const usps = [
 export const navLinks = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
-  // { label: "Collections", href: "/collections" },
+  
   { label: "About Us", href: "/about" },
+  { label: "Contact us", href: "/contact" },
 ];

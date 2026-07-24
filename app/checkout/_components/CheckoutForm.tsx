@@ -1353,19 +1353,29 @@ export default function CheckoutForm({ shipping, isLoggedIn }: { shipping: Shipp
             <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider flex items-center gap-1.5" style={{ fontFamily: 'Playfair Display, serif' }}>
               <Tag className="w-4 h-4 text-[#c5a880]" /> Have a Coupon?
             </h3>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleApplyCoupon(); } }}
-                placeholder="e.g. WELCOME100"
-                className="flex-1 px-4 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs uppercase focus:outline-none font-semibold placeholder:normal-case placeholder:font-normal"
-              />
-              <button type="button" onClick={handleApplyCoupon} className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold rounded-xl transition-all">
-                Apply
-              </button>
-            </div>
+            <div className="flex flex-col xs:flex-row gap-2">
+  <input
+    type="text"
+    value={couponCode}
+    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleApplyCoupon();
+      }
+    }}
+    placeholder="e.g. WELCOME100"
+    className="flex-1 min-w-0 px-4 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs uppercase focus:outline-none font-semibold placeholder:normal-case placeholder:font-normal"
+  />
+
+  <button
+    type="button"
+    onClick={handleApplyCoupon}
+    className="w-full xs:w-auto px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold rounded-xl transition-all whitespace-nowrap"
+  >
+    Apply
+  </button>
+</div>
             {couponError && <p className="text-xs text-red-500 font-medium">{couponError}</p>}
             {couponSuccess && <p className="text-xs text-green-600 font-semibold">{couponSuccess}</p>}
           </div>

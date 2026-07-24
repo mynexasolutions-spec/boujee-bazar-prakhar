@@ -1661,3 +1661,21 @@ body {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+.reviewer-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviewer-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  background: #F8F4EE;
+  border: 1px solid #D8C3A5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #C8AA78;
+  flex-shrink: 0;
+}
